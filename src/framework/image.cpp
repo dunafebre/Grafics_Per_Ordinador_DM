@@ -442,7 +442,38 @@ void Image::DrawRect(int x, int y, int w, int h, const Color& borderColor, int b
 //Rasterizing Triangles
 void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor)
 {
+    DrawLineDDA(p0.x, p0.y, p1.x, p1.y, borderColor);
+    DrawLineDDA(p1.x, p1.y, p2.x, p2.y, borderColor);
+    DrawLineDDA(p2.x, p2.y, p0.x, p0.y, borderColor);
     
+    if(isFilled){
+        //taula
+        float maxY = std::max({std::abs(p0.y), std::abs(p1.y), std::abs(p2.y)});
+        float minY = std::min({std::abs(p0.y), std::abs(p1.y), std::abs(p2.y)});
+        float cell = maxY - minY;
+        std::vector<Cell> table(cell);
+        //table.resize(table_size);
+        
+        //ScanLineDDA(p0.)
+        
+        for(int i = minY; i < maxY; i++){
+            for(int n = 0; i < cell; n++){
+                DrawLineDDA(table[n].minx, i, table[n].maxx, i, fillColor);
+            }
+        }
+    }
 }
+
+void ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table)
+{
+    int min_y = std::min(abs(y0), abs(y1));
+    int max_y = std::max(abs(y0), abs(y1));
+    for(int n = min_y; n < max_y; n++){
+        table[n].minx = ...;
+    }
+        
+}
+
+
 
 

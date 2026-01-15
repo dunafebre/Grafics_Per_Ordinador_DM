@@ -30,6 +30,12 @@ class Image
         unsigned int bpp; // Bits per pixel
         unsigned char* data; // Bytes with the pixel information
     } TGAInfo;
+    
+    // Cell?
+    typedef struct Cell {
+        int minx = INT_MAX;
+        int maxx = INT_MIN;
+    };
 
 public:
     unsigned int width;

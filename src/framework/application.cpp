@@ -31,10 +31,10 @@ void Application::Init(void)
 // Render one frame
 void Application::Render(void)
 {
-    // ...
     framebuffer.Fill(Color::BLACK);
     framebuffer.DrawLineDDA(200, 300, 200 + 100 * cos(time), 300 + 100 * sin(time), Color::RED);
     framebuffer.DrawRect(600, 300, 250, 350, Color::RED, 10, true, Color::WHITE);
+    framebuffer.DrawTriangle(Vector2(250, 250), Vector2(350, 450), Vector2(200, 500), Color::WHITE, false,Color::RED);
     framebuffer.Render();
 }
 
