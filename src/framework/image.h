@@ -31,10 +31,10 @@ class Image
         unsigned char* data; // Bytes with the pixel information
     } TGAInfo;
     
-    // Cell?
-    typedef struct Cell {
-        int minx = INT_MAX;
-        int maxx = INT_MIN;
+    // Cell
+    struct Cell {
+        int minx = 999999;  
+        int maxx = -999999;
     };
 
 public:
@@ -88,6 +88,7 @@ public:
     void DrawLineDDA(int x0, int y0, int x1, int y1, const Color& c);
     void DrawRect(int x, int y, int w, int h, const Color& borderColor, int borderWidth, bool isFilled, const Color& fillColor);
     void DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor);
+    void ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table, int minY);
 
     // Used to easy code
     #ifndef IGNORE_LAMBDAS
