@@ -456,16 +456,14 @@ void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2
         //taula
         float maxY = std::max({std::abs(p0.y), std::abs(p1.y), std::abs(p2.y)});
         float minY = std::min({std::abs(p0.y), std::abs(p1.y), std::abs(p2.y)});
-        float height = maxY - minY;
+        //height_ = maxY - minY;
         std::vector<Cell> table(height);
-        
-        table.resize(height);
        
         ScanLineDDA(p0.x, p0.y, p1.x, p1.y, table, minY);
         ScanLineDDA(p1.x, p1.y, p2.x, p2.y, table, minY);
         ScanLineDDA(p2.x, p2.y, p0.x, p0.y, table, minY);
        
-        for(int i = 0; i < height; i++) {
+        for(int i = height; i < minY; i++) {
             DrawLineDDA(table[i].minx, i + minY, table[i].maxx, i + minY, fillColor);
         }
     }
@@ -484,8 +482,9 @@ void Image::ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table
     float x = x0;
     float y = y0;
     
-    for(int n = 0; n <= d; n++){
-        int table_index = (int)std::floor(y) - minY;
+    
+    for(int n = y0; n <= y1; n++){
+        int table_index = y - minY;
         if(table[table_index].minx > x){
             table[table_index].minx = x;
         }
