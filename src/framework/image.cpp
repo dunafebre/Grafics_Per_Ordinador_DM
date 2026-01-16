@@ -428,12 +428,20 @@ void Image::DrawLineDDA(int x0, int y0, int x1, int y1, const Color& c)
 //Drawing Rectangles
 void Image::DrawRect(int x, int y, int w, int h, const Color& borderColor, int borderWidth, bool isFilled, const Color& fillColor)
 {
-    for(int b = 0; b < borderWidth; b++){ //OJO, SENSE DDA
-        DrawLineDDA(x+b, y+b, x+b, y+h-1-b, borderColor); // | (esquerra)
-        DrawLineDDA(x+b, y+b, x+w-1-b, y+b, borderColor); // - (baix)
-        DrawLineDDA(x+w-1-b, y+b, x+w-1-b, y+h-1-b, borderColor); //    | (dreta)
-        DrawLineDDA(x+b, y+h-1-b, x+w-1-b, y+h-1-b, borderColor); //    - (dalt)
-    } //mini problema en la esquina superior dreta, revisar
+    for(int b = 0; b < borderWidth; b++){
+        
+        for(int i = x+b; i <= x+w-1-b; i++)
+            SetPixel(i, y+b, borderColor);
+
+        for(int i = x+b; i <= x+w-1-b; i++)
+            SetPixel(i, y+h-1-b, borderColor);
+
+        for(int j = y+b; j <= y+h-1-b; j++)
+            SetPixel(x+b, j, borderColor);
+
+        for(int j = y+b; j <= y+h-1-b; j++)
+            SetPixel(x+w-1-b, j, borderColor);
+    }
     
     if(isFilled){
         for(int j = y + borderWidth; j < y+h-borderWidth; j++){
@@ -448,25 +456,29 @@ void Image::DrawRect(int x, int y, int w, int h, const Color& borderColor, int b
 //Rasterizing Triangles
 void Image::DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor)
 {
-    DrawLineDDA(p0.x, p0.y, p1.x, p1.y, borderColor);
-    DrawLineDDA(p1.x, p1.y, p2.x, p2.y, borderColor);
-    DrawLineDDA(p2.x, p2.y, p0.x, p0.y, borderColor);
-   
     if(isFilled){
-        //taula
-        float maxY = std::max({std::abs(p0.y), std::abs(p1.y), std::abs(p2.y)});
-        float minY = std::min({std::abs(p0.y), std::abs(p1.y), std::abs(p2.y)});
-        //height_ = maxY - minY;
-        std::vector<Cell> table(height);
+        
+        int minY = std::min({p0.y, p1.y, p2.y});
+        int maxY = std::max({p0.y, p1.y, p2.y});
+        int height_ = maxY - minY + 1;
+        std::vector<Cell> table(height_);
        
         ScanLineDDA(p0.x, p0.y, p1.x, p1.y, table, minY);
         ScanLineDDA(p1.x, p1.y, p2.x, p2.y, table, minY);
         ScanLineDDA(p2.x, p2.y, p0.x, p0.y, table, minY);
        
-        for(int i = height; i < minY; i++) {
-            DrawLineDDA(table[i].minx, i + minY, table[i].maxx, i + minY, fillColor);
+        for(int i = 0; i < height_; i++) {
+            int y = i + minY;
+            for(int x = table[i].minx; x <= table[i].maxx; x++){
+                SetPixel(x, y, fillColor);
+            }
         }
     }
+    
+    DrawLineDDA(p0.x, p0.y, p1.x, p1.y, borderColor);
+    DrawLineDDA(p1.x, p1.y, p2.x, p2.y, borderColor);
+    DrawLineDDA(p2.x, p2.y, p0.x, p0.y, borderColor);
+   
 }
 
 void Image::ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table, int minY)
@@ -482,14 +494,13 @@ void Image::ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table
     float x = x0;
     float y = y0;
     
-    
-    for(int n = y0; n <= y1; n++){
-        int table_index = y - minY;
-        if(table[table_index].minx > x){
-            table[table_index].minx = x;
+    for(int i = 0; i < d; i++){
+        int index = (int)round(y) - minY;
+        if(table[index].minx > x){
+            table[index].minx = x;
         }
-        if(table[table_index].maxx < x){
-            table[table_index].maxx = x;
+        if(table[index].maxx < x){
+            table[index].maxx = x;
         }
         x += vx;
         y += vy;
