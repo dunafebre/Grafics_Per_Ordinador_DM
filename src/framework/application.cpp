@@ -29,55 +29,55 @@ void Application::Init(void)
     std::cout << "Initiating app..." << std::endl;
     
     Image img_pencil;
-    img_pencil.LoadPNG("/Users/dunafebrevila/res/images/pencil.png");
+    img_pencil.LoadPNG("images/pencil.png");
     
     Image img_blau_clar;
-    img_blau_clar.LoadPNG("res/images/cyan.png");
+    img_blau_clar.LoadPNG("images/cyan.png");
     
     Image img_blau_fosc;
-    img_blau_fosc.LoadPNG("res/images/blue.png");
+    img_blau_fosc.LoadPNG("images/blue.png");
     
     Image img_vermell;
-    img_vermell.LoadPNG("res/images/red.png");
+    img_vermell.LoadPNG("images/red.png");
     
     Image img_groc;
-    img_groc.LoadPNG("res/images/yellow.png");
+    img_groc.LoadPNG("images/yellow.png");
     
     Image img_rosa;
-    img_rosa.LoadPNG("res/images/pink.png");
+    img_rosa.LoadPNG("images/pink.png");
     
     Image img_blanc;
-    img_blanc.LoadPNG("res/images/white.png");
+    img_blanc.LoadPNG("images/white.png");
     
     Image img_negre;
-    img_negre.LoadPNG("res/images/black.png");
+    img_negre.LoadPNG("images/black.png");
     
     Image img_green;
-    img_green.LoadPNG("res/images/green.png");
+    img_green.LoadPNG("images/green.png");
     
     Image img_eraser;
-    img_eraser.LoadPNG("res/images/eraser.png");
+    img_eraser.LoadPNG("images/eraser.png");
     
     Image img_triangle;
-    img_triangle.LoadPNG("res/images/triangle.png");
+    img_triangle.LoadPNG("images/triangle.png");
 
     Image img_line;
-    img_line.LoadPNG("res/images/line.png");
+    img_line.LoadPNG("images/line.png");
     
     Image img_rectangle;
-    img_rectangle.LoadPNG("res/images/rectangle.png");
+    img_rectangle.LoadPNG("images/rectangle.png");
     
     Image img_clear;
-    img_clear.LoadPNG("res/images/clear.png");
+    img_clear.LoadPNG("images/clear.png");
     
     Image img_load;
-    img_load.LoadPNG("res/images/load.png");
+    img_load.LoadPNG("images/load.png");
     
     Image img_save;
-    img_save.LoadPNG("res/images/save.png");
+    img_save.LoadPNG("images/save.png");
     
     int x_offset = 10;
-    int y_toolbar = 0;
+    int y_toolbar = 5;
     int spacing = 50;
 
     buttons.push_back(Button(img_pencil, Vector2(x_offset, y_toolbar), ButtonType::PENCIL));
@@ -134,12 +134,11 @@ void Application::Init(void)
 void Application::Render(void)
 {
     //framebuffer.Fill(Color::BLACK);
-    //framebuffer.DrawLineDDA(200, 300, 200 + 100 * cos(time), 300 + 100 * sin(time), Color::RED);
-    //framebuffer.DrawRect(600, 300, 250, 350, Color::RED, 10, true, Color::WHITE);
-    //framebuffer.DrawTriangle(Vector2(250, 250), Vector2(350, 450), Vector2(200, 500), Color::WHITE, true,Color::RED);
+    framebuffer.DrawRect(0, 0, framebuffer.width, 50, Color::GRAY, 0, true, Color::GRAY);
+    
     for (Button& b : buttons)
     {
-        framebuffer.DrawImage(b.image, b.position.x, framebuffer.height - b.position.y);
+        framebuffer.DrawImage(b.image, b.position.x, b.position.y);
     }
     framebuffer.Render();
 }
@@ -269,7 +268,7 @@ void Application::HandleButton(ButtonType type)
             current_color = Color::YELLOW;
             break;
         case ButtonType::ROSA:
-            current_color = Color::PINK;
+            current_color = Color::PURPLE;
             break;
         case ButtonType::BLANC:
             current_color = Color::WHITE;

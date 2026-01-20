@@ -59,7 +59,6 @@ public:
 	static const Color CYAN;
 	static const Color YELLOW;
 	static const Color PURPLE;
-    static const Color PINK; //aixo dona error 
 };
 
 inline Color operator * (const Color& c, float v) { return Color((unsigned char)(c.r*v), (unsigned char)(c.g*v), (unsigned char)(c.b*v)); }
