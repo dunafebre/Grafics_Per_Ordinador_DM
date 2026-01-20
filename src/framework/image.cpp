@@ -506,3 +506,13 @@ void Image::ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table
         y += vy;
     }
 }
+
+void Image::DrawImage(const Image& image, int x, int y)
+{
+    for(int i = 0; i < image.width; i++){
+        for(int j = 0; j < image.height; j++){
+            Color pixel = image.GetPixel(i,j);
+            SetPixel(x+i,y+j,pixel);
+        }
+    }
+}

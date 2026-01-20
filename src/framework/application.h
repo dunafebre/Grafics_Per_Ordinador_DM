@@ -17,6 +17,7 @@ public:
 	SDL_Window* window = nullptr;
 	int window_width;
 	int window_height;
+    std::vector<Button> buttons;
 
 	float time;
 
@@ -25,6 +26,12 @@ public:
 	int mouse_state; // Tells which buttons are pressed
 	Vector2 mouse_position; // Last mouse position
 	Vector2 mouse_delta; // Mouse movement in the last frame
+    Vector2 mouse_start; // Mouse position in the first click
+    int figura; //0 = line; 1 = rectangle; 2 = triangle
+    Color current_color;
+    bool pencil_active = false;
+    bool eraser_active = false; 
+    
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
@@ -32,6 +39,7 @@ public:
 	void OnMouseMove(SDL_MouseButtonEvent event);
 	void OnWheel(SDL_MouseWheelEvent event);
 	void OnFileChanged(const char* filename);
+    void HandleButton(ButtonType type);
 
 	// CPU Global framebuffer
 	Image framebuffer;

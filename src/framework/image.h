@@ -19,6 +19,7 @@
 class FloatImage;
 class Entity;
 class Camera;
+class Button;
 
 // A matrix of pixels
 class Image
@@ -31,9 +32,9 @@ class Image
         unsigned char* data; // Bytes with the pixel information
     } TGAInfo;
     
-    // Cell
+    //Cell
     struct Cell {
-        int minx = 999999;  
+        int minx = 999999;
         int maxx = -999999;
     };
 
@@ -89,6 +90,7 @@ public:
     void DrawRect(int x, int y, int w, int h, const Color& borderColor, int borderWidth, bool isFilled, const Color& fillColor);
     void DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor);
     void ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table, int minY);
+    void DrawImage(const Image& image, int x, int y);
 
     // Used to easy code
     #ifndef IGNORE_LAMBDAS
@@ -135,5 +137,55 @@ public:
     inline void SetPixelUnsafe(unsigned int x, unsigned int y, const float& v) { pixels[y * width + x] = v; }
 
     void Resize(unsigned int width, unsigned int height);
+};
+
+enum class ButtonType
+{
+    PENCIL,
+    BLAU_CLAR,
+    BLAU_FOSC,
+    VERMELL,
+    GROC,
+    ROSA,
+    BLANC,
+    NEGRE,
+    VERD,
+    ERASER,
+    TRIANGLE,
+    LINE,
+    RECTANGLE,
+    CLEAR_IMAGE,
+    LOAD_IMAGE,
+    SAVE_IMAGE
+};
+
+
+class Button
+{
+public:
+    Image image;
+    Vector2 position;
+    ButtonType type;
+    
+    // CONSTRUCTORS
+    Button(Image img, Vector2 pos, ButtonType t)
+    {
+        image = img;
+        position = pos;
+        type = t;
+    }
+    
+    // funció
+    bool IsMouseInside(Vector2 mousePosition)
+    {
+        if (mousePosition.x >= position.x &&
+            mousePosition.x <= position.x + image.width &&
+            mousePosition.y >= position.y &&
+            mousePosition.y <= position.y + image.height)
+        {
+            return true;
+        }
+        return false;
+    }
 };
 
