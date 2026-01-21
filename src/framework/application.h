@@ -30,7 +30,8 @@ public:
     int figura; //0 = line; 1 = rectangle; 2 = triangle
     Color current_color;
     bool pencil_active = false;
-    bool eraser_active = false; 
+    bool eraser_active = false;
+    bool is_clicking_toolbar = false;
     
 
 	void OnKeyPressed(SDL_KeyboardEvent event);

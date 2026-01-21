@@ -21,7 +21,6 @@ Application::Application(const char* caption, int width, int height)
 
 Application::~Application()
 {
-    //fer
 }
 
 void Application::Init(void)
@@ -76,9 +75,9 @@ void Application::Init(void)
     Image img_save;
     img_save.LoadPNG("images/save.png");
     
-    int x_offset = 10;
-    int y_toolbar = 5;
-    int spacing = 50;
+    int x_offset = 10; //marge esquerre de 10 pixels per posar la primera imatge
+    int y_toolbar = 5; //marge inferior de 5 pixels (distancia de les imatges al "terra")
+    int spacing = 50; //separació entre imatges
 
     buttons.push_back(Button(img_pencil, Vector2(x_offset, y_toolbar), ButtonType::PENCIL));
     x_offset += spacing;
@@ -127,6 +126,10 @@ void Application::Init(void)
 
     buttons.push_back(Button(img_save, Vector2(x_offset, y_toolbar), ButtonType::SAVE_IMAGE));
     x_offset += spacing;
+    
+    current_color = Color::WHITE;
+    figura = 0;
+    pencil_active = true;
 
 }
 
@@ -134,7 +137,7 @@ void Application::Init(void)
 void Application::Render(void)
 {
     //framebuffer.Fill(Color::BLACK);
-    framebuffer.DrawRect(0, 0, framebuffer.width, 50, Color::GRAY, 0, true, Color::GRAY);
+    framebuffer.DrawRect(0, 0, framebuffer.width, 50, Color::GRAY, 0, true, Color::GRAY); //des d'abaix a la esquerra, 50 pixels d'alçada per la toolbar
     
     for (Button& b : buttons)
     {
@@ -163,14 +166,17 @@ void Application::OnMouseButtonDown(SDL_MouseButtonEvent event)
         mouse_state |= SDL_BUTTON(SDL_BUTTON_LEFT); //canviem l'estat del ratolí a button left presionat amb una operació OR
 
         mouse_start.x = event.x;
-        mouse_start.y = event.y;
+        mouse_start.y = framebuffer.height - event.y;
+        
+        
+        is_clicking_toolbar = (event.y > (framebuffer.height - 50)); //si el ratolí està per sobre de "550", estara tocant la barra
         
         for(Button& b : buttons)
         {
             if(b.IsMouseInside(mouse_start))
             {
                 HandleButton(b.type);
-                break; // solo el primero que coincide
+                return;
             }
         }
     }
@@ -181,39 +187,49 @@ void Application::OnMouseButtonUp(SDL_MouseButtonEvent event)
     if (event.button == SDL_BUTTON_LEFT) {
         mouse_state &= ~SDL_BUTTON(SDL_BUTTON_LEFT);
         
+        if (pencil_active || eraser_active || is_clicking_toolbar) { //per evitar que faci figures quan s'esta utilitzant el llapis o la goma o quan es clica sobre la toolbar
+            return; //no fa res
+        }
+        
+        float y_invertida = framebuffer.height - event.y; //y del ratolí/Xcode -> y de les imatges
+        
         if(figura == 0){
-            framebuffer.DrawLineDDA(mouse_start.x, mouse_start.y, event.x, event.y, current_color);
+            framebuffer.DrawLineDDA(mouse_start.x, mouse_start.y, event.x, y_invertida, current_color);
         }
         else if(figura == 1){
-            int w = event.x - mouse_start.x;
-            int h = event.y - mouse_start.y;
-            framebuffer.DrawRect(mouse_start.x, mouse_start.y, abs(w), abs(h), current_color, 1, true, current_color);
+            int x_min = std::min(mouse_start.x, (float)event.x); //agafen la esquina inferior esquerra sigui quina sigui la direcció en que fas el rectangle
+            int y_min = std::min(mouse_start.y, y_invertida);
+            int width = std::abs((float)event.x - mouse_start.x);
+            int height = std::abs(y_invertida - mouse_start.y);
+            
+            framebuffer.DrawRect(x_min, y_min, width, height, current_color, 1, true, current_color);
         }
         else if(figura == 2){
             //triangle isòsceles rectangle
             Vector2 p0 = mouse_start;
-            Vector2 p1 = Vector2(event.x, event.y);
-            Vector2 p2 = Vector2(mouse_start.x, event.y);
-
-            framebuffer.DrawTriangle(p0, p1, p2, Color::GREEN, true, current_color);
+            Vector2 p1 = Vector2(event.x, y_invertida);
+            Vector2 p2 = Vector2(mouse_start.x, y_invertida);
+            
+            framebuffer.DrawTriangle(p0, p1, p2, current_color, true, current_color);
         }
     }
 }
 
 void Application::OnMouseMove(SDL_MouseButtonEvent event)
 {
-    mouse_position.x = event.x;
-    mouse_position.y = event.y;
+    mouse_delta = mouse_position; //guardem la posició anterior abans d'actualitzar-la
     
-    if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT)){
+    mouse_position.x = event.x;
+    mouse_position.y = framebuffer.height - event.y; //totes les posicions del ratolí s'han d'invertir perque van al revés que les imatges
+    
+    if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT) && !is_clicking_toolbar){
         if(pencil_active){
-            framebuffer.SetPixel((int)mouse_position.x, (int)mouse_position.y, current_color);
+            framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, current_color); //per que els pixels a pintar quedin més units, fem linies
         }
         else if(eraser_active){
-            framebuffer.SetPixel((int)mouse_position.x, (int)mouse_position.y, Color::BLACK); // o Color::WHITE
+            framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, Color::BLACK);
         }
     }
-
 }
 
 void Application::OnWheel(SDL_MouseWheelEvent event)
@@ -285,7 +301,7 @@ void Application::HandleButton(ButtonType type)
         case ButtonType::LOAD_IMAGE:
         {
             Image loaded;
-            if(loaded.LoadPNG("res/images/test.png")){  // mirar path
+            if(loaded.LoadPNG("images/test.png")){  //mirar path!!!
                 framebuffer = loaded;
             }
         }
