@@ -130,18 +130,28 @@ void Application::Init(void)
     current_color = Color::WHITE;
     figura = 0;
     pencil_active = true;
+    eraser_active = false;
+    paint_active = true;
+    animation_active = false;
+    
+    ps.Init();
 
 }
 
 // Render one frame
 void Application::Render(void)
 {
-    //framebuffer.Fill(Color::BLACK);
-    framebuffer.DrawRect(0, 0, framebuffer.width, 50, Color::GRAY, 0, true, Color::GRAY); //des d'abaix a la esquerra, 50 pixels d'alçada per la toolbar
-    
-    for (Button& b : buttons)
-    {
-        framebuffer.DrawImage(b.image, b.position.x, b.position.y);
+    if(animation_active){
+        framebuffer.Fill(Color::BLACK);
+        ps.Render(&framebuffer);
+    }
+    else if(paint_active){
+        framebuffer.DrawRect(0, 0, framebuffer.width, 50, Color::GRAY, 0, true, Color::GRAY); //des d'abaix a la esquerra, 50 pixels d'alçada per la toolbar
+        
+        for (Button& b : buttons)
+        {
+            framebuffer.DrawImage(b.image, b.position.x, b.position.y);
+        }
     }
     framebuffer.Render();
 }
@@ -149,6 +159,7 @@ void Application::Render(void)
 // Called after render
 void Application::Update(float seconds_elapsed)
 {
+    ps.Update(seconds_elapsed);
 }
 
 //keyboard press event
@@ -157,6 +168,24 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
     // KEY CODES: https://wiki.libsdl.org/SDL2/SDL_Keycode
     switch(event.keysym.sym) {
         case SDLK_ESCAPE: exit(0); break; // ESC key, kill the app
+        case SDLK_1:
+            paint_active = true;
+            animation_active = false;
+            framebuffer.Fill(Color::BLACK);
+            break;
+        case SDLK_2:
+            paint_active = false;
+            animation_active = true;
+            break;
+        case SDLK_f:
+            fill_pressed = true;
+            break;
+        case SDLK_PLUS:
+            current_border++;
+            break;
+        case SDLK_MINUS:
+            current_border--;
+            break;
     }
 }
 
@@ -167,7 +196,6 @@ void Application::OnMouseButtonDown(SDL_MouseButtonEvent event)
 
         mouse_start.x = event.x;
         mouse_start.y = framebuffer.height - event.y;
-        
         
         is_clicking_toolbar = (event.y > (framebuffer.height - 50)); //si el ratolí està per sobre de "550", estara tocant la barra
         
@@ -202,7 +230,16 @@ void Application::OnMouseButtonUp(SDL_MouseButtonEvent event)
             int width = std::abs((float)event.x - mouse_start.x);
             int height = std::abs(y_invertida - mouse_start.y);
             
-            framebuffer.DrawRect(x_min, y_min, width, height, current_color, 1, true, current_color);
+            if(current_border < 1){
+                current_border = 1;
+            }
+            
+            if(!fill_pressed){
+                framebuffer.DrawRect(x_min, y_min, width, height, current_color, current_border, false, current_color);
+            }
+            else{
+                framebuffer.DrawRect(x_min, y_min, width, height, current_color, current_border, true, current_color);
+            }
         }
         else if(figura == 2){
             //triangle isòsceles rectangle
@@ -210,7 +247,12 @@ void Application::OnMouseButtonUp(SDL_MouseButtonEvent event)
             Vector2 p1 = Vector2(event.x, y_invertida);
             Vector2 p2 = Vector2(mouse_start.x, y_invertida);
             
-            framebuffer.DrawTriangle(p0, p1, p2, current_color, true, current_color);
+            if(!fill_pressed){
+                framebuffer.DrawTriangle(p0, p1, p2, current_color, false, current_color);
+            }
+            else{
+                framebuffer.DrawTriangle(p0, p1, p2, current_color, true, current_color);
+            }
         }
     }
 }
@@ -301,7 +343,7 @@ void Application::HandleButton(ButtonType type)
         case ButtonType::LOAD_IMAGE:
         {
             Image loaded;
-            if(loaded.LoadPNG("images/test.png")){  //mirar path!!!
+            if(loaded.LoadPNG("images/fruits.png")){
                 framebuffer = loaded;
             }
         }

@@ -189,3 +189,75 @@ public:
     }
 };
 
+class ParticleSystem
+{
+    
+    static const int MAX_PARTICLES = 500;
+    Image* framebuffer;
+    
+    struct Particle {
+        Vector2 position;
+        Vector2 velocity;
+        Color color;
+        float acceleration;
+        float ttl;
+        bool inactive;   
+    };
+    
+    Particle particles[MAX_PARTICLES];
+    
+public:
+    void Init()
+    {   
+        
+        for (int i = 0; i < MAX_PARTICLES; i++)
+        {
+            particles[i].position = Vector2(rand() % 1500, rand() % 1000); //(rand() % (maximo - minimo + 1)) + minimo;
+            particles[i].velocity = Vector2(-3.f + rand() % 6, 8.f + rand() % 12);
+            particles[i].color = Color::WHITE;
+            particles[i].acceleration = 0.f;
+            particles[i].ttl = 100.f;
+            particles[i].inactive = false;
+        }
+    }
+    
+    void Update(float dt)
+    {
+        for (int i = 0; i < MAX_PARTICLES; i++)
+        {
+            if (!particles[i].inactive)
+            {
+                particles[i].velocity.x += (-1.f + rand() % 3) * dt;
+                particles[i].position = particles[i].position + particles[i].velocity * dt; //p(t+1) = p(t) + v*t
+    
+                particles[i].ttl -= dt;
+                if (particles[i].ttl <= 0.f)
+                {
+                    particles[i].inactive = true;
+                }
+                
+                if (particles[i].position.y > 1000)
+                {
+                    particles[i].position.y = -5;
+                    particles[i].position.x = rand() % 1000;
+                }
+            }
+        }
+    }
+    
+    void Render(Image* framebuffer)
+    {
+        for (int i = 0; i < MAX_PARTICLES; i++)
+        {
+            if (!particles[i].inactive)
+            {
+                int x = (int)particles[i].position.x;
+                int y = framebuffer->height - (int)particles[i].position.y;
+
+                framebuffer->SetPixel(x, y, particles[i].color);
+            }
+        }
+    }
+
+};
+

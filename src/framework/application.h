@@ -32,6 +32,11 @@ public:
     bool pencil_active = false;
     bool eraser_active = false;
     bool is_clicking_toolbar = false;
+    bool paint_active = false;
+    bool animation_active = false;
+    bool fill_pressed = false;
+    int current_border = 1;
+    ParticleSystem ps;
     
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
