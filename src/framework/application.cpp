@@ -27,7 +27,8 @@ void Application::Init(void)
 {
     std::cout << "Initiating app..." << std::endl;
     
-    Image img_pencil;
+    //lab01
+    /*Image img_pencil;
     img_pencil.LoadPNG("images/pencil.png");
     
     Image img_blau_clar;
@@ -134,14 +135,42 @@ void Application::Init(void)
     paint_active = true;
     animation_active = false;
     
-    ps.Init();
+    ps.Init();*/
+    
+    //lab02
+    Mesh* mesh1 = new Mesh();
+    mesh1->LoadOBJ("meshes/lee.obj");
+    Matrix44 model1;
+    model1.SetIdentity();
+    entity1 = new Entity(*mesh1, model1, ROTATE);
+    
+    Mesh* mesh2 = new Mesh();
+    mesh2->LoadOBJ("meshes/anna.obj");
+    Matrix44 model2;
+    model2.SetIdentity();
+    entity2 = new Entity(*mesh2, model2, TRANSLATE);
+    
+    Mesh* mesh3 = new Mesh();
+    mesh3->LoadOBJ("meshes/cleo.obj");
+    Matrix44 model3;
+    model3.SetIdentity();
+    entity3 = new Entity(*mesh3, model3, SCALE);
+    
+    camera = new Camera();
 
+    camera->SetPerspective(40.0f, framebuffer.width / (float)framebuffer.height, 0.1f, 1000.0f);
+    camera->LookAt(Vector3(0,0,1), Vector3(0,-0.2,0), Vector3(0,1,0));
+
+    camera->UpdateViewMatrix();
+    camera->UpdateProjectionMatrix();
+    camera->UpdateViewProjectionMatrix();
 }
 
 // Render one frame
 void Application::Render(void)
 {
-    if(animation_active){
+    //lab01
+    /*if(animation_active){
         framebuffer.Fill(Color::BLACK);
         ps.Render(&framebuffer);
     }
@@ -152,14 +181,26 @@ void Application::Render(void)
         {
             framebuffer.DrawImage(b.image, b.position.x, b.position.y);
         }
-    }
+    }*/
+    
+    //lab02
+    framebuffer.Fill(Color::BLACK);
+    entity1->Render(&framebuffer, camera, Color::WHITE);
+    entity2->Render(&framebuffer, camera, Color::RED);
+    entity3->Render(&framebuffer, camera, Color::GREEN);
     framebuffer.Render();
 }
 
 // Called after render
 void Application::Update(float seconds_elapsed)
 {
-    ps.Update(seconds_elapsed);
+    //lab01
+    /*ps.Update(seconds_elapsed);*/
+    
+    //lab02
+    entity1->Update(seconds_elapsed);
+    entity2->Update(seconds_elapsed);
+    entity3->Update(seconds_elapsed);
 }
 
 //keyboard press event
@@ -225,7 +266,7 @@ void Application::OnMouseButtonUp(SDL_MouseButtonEvent event)
             framebuffer.DrawLineDDA(mouse_start.x, mouse_start.y, event.x, y_invertida, current_color);
         }
         else if(figura == 1){
-            int x_min = std::min(mouse_start.x, (float)event.x); //agafen la esquina inferior esquerra sigui quina sigui la direcció en que fas el rectangle
+            int x_min = std::min(mouse_start.x, (float)event.x); //agafem la esquina inferior esquerra sigui quina sigui la direcció en que fas el rectangle
             int y_min = std::min(mouse_start.y, y_invertida);
             int width = std::abs((float)event.x - mouse_start.x);
             int height = std::abs(y_invertida - mouse_start.y);

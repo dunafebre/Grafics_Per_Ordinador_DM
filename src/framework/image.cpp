@@ -450,7 +450,6 @@ void Image::DrawRect(int x, int y, int w, int h, const Color& borderColor, int b
             }
         }
     }
-    //el borde ha de canviar amb les tecles "+" i "-", interactivament!!
 }
 
 //Rasterizing Triangles

@@ -7,6 +7,8 @@
 #include "main/includes.h"
 #include "framework.h"
 #include "image.h"
+#include "entity.h"
+#include "mesh.h"
 
 class Application
 {
@@ -38,6 +40,11 @@ public:
     int current_border = 1;
     ParticleSystem ps;
     
+    //lab2
+    Entity* entity1;
+    Entity* entity2;
+    Entity* entity3;
+    Camera* camera;
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
@@ -64,6 +71,13 @@ public:
 		this->window_width = width;
 		this->window_height = height;
 		this->framebuffer.Resize(width, height);
+        
+        if (camera)
+        {
+            camera->SetAspectRatio(width / (float)height);
+            camera->UpdateProjectionMatrix();
+            camera->UpdateViewProjectionMatrix();
+        }
 	}
 
 	Vector2 GetWindowSize()
