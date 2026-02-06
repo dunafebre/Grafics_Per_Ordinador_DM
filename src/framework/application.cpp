@@ -272,7 +272,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             camera->UpdateProjectionMatrix();
             break;
         
-        case SDLK_KP_MINUS:
+        case SDLK_MINUS:
             if (current_property == CAM_NEAR)
                 camera->near_plane = std::max(0.01f, camera->near_plane - 0.1f);
             else if (current_property == CAM_FAR)
