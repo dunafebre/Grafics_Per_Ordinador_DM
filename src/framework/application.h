@@ -52,6 +52,7 @@ public:
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
 	void OnMouseButtonUp(SDL_MouseButtonEvent event);
 	void OnMouseMove(SDL_MouseButtonEvent event);
+    void OnMouseMove2(SDL_MouseMotionEvent event);
 	void OnWheel(SDL_MouseWheelEvent event);
 	void OnFileChanged(const char* filename);
     void HandleButton(ButtonType type);

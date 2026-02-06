@@ -18,7 +18,7 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
         Vector3 v0 = model * mesh->vertices[i];
         Vector3 v1 = model * mesh->vertices[i + 1];
         Vector3 v2 = model * mesh->vertices[i + 2];
-
+        
         //world -> view -> clip
         v0 = camera->ProjectVector(v0);
         v1 = camera->ProjectVector(v1);
@@ -53,30 +53,36 @@ void Entity::Update(float seconds_elapsed)
     {
         case ROTATE:
         {
-            float angle = seconds_elapsed;
-            Vector3 axis(0, 1, 0);
             Matrix44 rotation;
-            rotation.MakeRotationMatrix(angle, axis);
+            rotation.SetIdentity();
+            rotation.MakeRotationMatrix(3.141592f * 0.25f, Vector3(0,1,0));
             model = rotation;
             break;
         }
 
         case TRANSLATE:
         {
-            float tx = sin(seconds_elapsed) * 2.0f;
             Matrix44 translation;
-            translation.MakeTranslationMatrix(tx, 0.0f, 0.0f);
+            translation.SetIdentity();
+            translation.MakeTranslationMatrix(-0.4f, 0.0f, 0.0f);
             model = translation;
             break;
         }
 
         case SCALE:
         {
-            float s = cos(seconds_elapsed) + 0.2f;
             Matrix44 scale;
-            scale.MakeScaleMatrix(s, s, s);
+            scale.SetIdentity();
+            scale.MakeScaleMatrix(0.5f, 0.5f, 0.5f);
             model = scale;
             break;
+        }
+        
+        case ZERO:
+        {
+            Matrix44 null;
+            null.SetIdentity();
+            model = null;
         }
     }
 }

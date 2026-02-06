@@ -141,20 +141,17 @@ void Application::Init(void)
     Mesh* mesh1 = new Mesh();
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
-    model1.MakeTranslationMatrix(-200.0f, 0.0f, 0.0f);
-    entity1 = new Entity(mesh1, model1, ROTATE);
+    entity1 = new Entity(mesh1, model1, SCALE);
     
     Mesh* mesh2 = new Mesh();
     mesh2->LoadOBJ("meshes/anna.obj");
     Matrix44 model2;
-    model2.SetIdentity();
     entity2 = new Entity(mesh2, model2, TRANSLATE);
     
     Mesh* mesh3 = new Mesh();
     mesh3->LoadOBJ("meshes/cleo.obj");
     Matrix44 model3;
-    model3.MakeTranslationMatrix(200.0f, 0.0f, 0.0f);
-    entity3 = new Entity(mesh3, model3, SCALE);
+    entity3 = new Entity(mesh3, model3, ROTATE);
     
     camera = new Camera();
 
@@ -166,6 +163,7 @@ void Application::Init(void)
     camera->UpdateViewProjectionMatrix();
     
     current_property = CAM_FOV;
+    scene_mode = 1;
 }
 
 // Render one frame
@@ -191,7 +189,7 @@ void Application::Render(void)
     if (scene_mode == 1) {
         entity1->Render(&framebuffer, camera, Color::WHITE);
     }
-    else {
+    else if (scene_mode == 2){
         entity1->Render(&framebuffer, camera, Color::WHITE);
         entity2->Render(&framebuffer, camera, Color::RED);
         entity3->Render(&framebuffer, camera, Color::GREEN);
@@ -208,9 +206,15 @@ void Application::Update(float seconds_elapsed)
     /*ps.Update(seconds_elapsed);*/
     
     //lab02
-    entity1->Update(seconds_elapsed);
-    entity2->Update(seconds_elapsed);
-    entity3->Update(seconds_elapsed);
+    if (scene_mode == 1) {
+        entity1->Update(seconds_elapsed);
+    }
+    else if (scene_mode == 2) {
+        entity1->Update(seconds_elapsed);
+        entity2->Update(seconds_elapsed);
+        entity3->Update(seconds_elapsed);
+    }
+
 }
 
 //keyboard press event
@@ -354,31 +358,35 @@ void Application::OnMouseMove(SDL_MouseButtonEvent event)
 {
     //lab01
     /*mouse_delta = mouse_position; //guardem la posició anterior abans d'actualitzar-la
-    
-    mouse_position.x = event.x;
-    mouse_position.y = framebuffer.height - event.y; //totes les posicions del ratolí s'han d'invertir perque van al revés que les imatges
-    
-    if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT) && !is_clicking_toolbar){
-        if(pencil_active){
-            framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, current_color); //per que els pixels a pintar quedin més units, fem linies
-        }
-        else if(eraser_active){
-            framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, Color::BLACK);
-        }
-    }*/
-    
+     
+     mouse_position.x = event.x;
+     mouse_position.y = framebuffer.height - event.y; //totes les posicions del ratolí s'han d'invertir perque van al revés que les imatges
+     
+     if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT) && !is_clicking_toolbar){
+     if(pencil_active){
+     framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, current_color); //per que els pixels a pintar quedin més units, fem linies
+     }
+     else if(eraser_active){
+     framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, Color::BLACK);
+     }
+     }*/
+
     //lab02
-    if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT)){ //eye
-        float dx = event.x * 0.01f;
-        float dy = event.y * 0.01f;
+    mouse_delta = mouse_position; //guardem la posició anterior abans d'actualitzar-la
+     
+    mouse_position.x = event.x;
+    mouse_position.y = framebuffer.height - event.y;
+    if(mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)){ //a
+        float dx = (mouse_position.x - mouse_delta.x) * 0.01f;
+        float dy = (mouse_position.y - mouse_delta.y) * 0.01f;
 
         camera->Rotate(dx, Vector3(0,1,0));
         camera->Rotate(-dy, Vector3(1,0,0));
     }
     
-    if (mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)) { //center
-        float dx = event.x * 0.01f;
-        float dy = event.y * 0.01f;
+    else if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT)) { //e
+        float dx = (mouse_position.x - mouse_delta.x) * 0.01f;
+        float dy = (mouse_position.y - mouse_delta.y) * 0.01f;
 
         camera->center.x -= dx;
         camera->center.y += dy;
@@ -386,6 +394,7 @@ void Application::OnMouseMove(SDL_MouseButtonEvent event)
         camera->UpdateViewMatrix();
     }
 }
+
 
 void Application::OnWheel(SDL_MouseWheelEvent event)
 {

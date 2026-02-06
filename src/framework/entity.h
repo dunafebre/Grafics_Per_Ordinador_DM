@@ -9,6 +9,7 @@
 #include <iostream>
 
 enum AnimationType {
+    ZERO,
     ROTATE,
     TRANSLATE,
     SCALE
