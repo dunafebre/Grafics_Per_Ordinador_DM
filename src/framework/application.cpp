@@ -141,20 +141,20 @@ void Application::Init(void)
     Mesh* mesh1 = new Mesh();
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
-    model1.SetIdentity();
-    entity1 = new Entity(*mesh1, model1, ROTATE);
+    model1.MakeTranslationMatrix(-200.0f, 0.0f, 0.0f);
+    entity1 = new Entity(mesh1, model1, ROTATE);
     
     Mesh* mesh2 = new Mesh();
     mesh2->LoadOBJ("meshes/anna.obj");
     Matrix44 model2;
     model2.SetIdentity();
-    entity2 = new Entity(*mesh2, model2, TRANSLATE);
+    entity2 = new Entity(mesh2, model2, TRANSLATE);
     
     Mesh* mesh3 = new Mesh();
     mesh3->LoadOBJ("meshes/cleo.obj");
     Matrix44 model3;
-    model3.SetIdentity();
-    entity3 = new Entity(*mesh3, model3, SCALE);
+    model3.MakeTranslationMatrix(200.0f, 0.0f, 0.0f);
+    entity3 = new Entity(mesh3, model3, SCALE);
     
     camera = new Camera();
 
@@ -164,6 +164,8 @@ void Application::Init(void)
     camera->UpdateViewMatrix();
     camera->UpdateProjectionMatrix();
     camera->UpdateViewProjectionMatrix();
+    
+    current_property = CAM_FOV;
 }
 
 // Render one frame
@@ -185,10 +187,18 @@ void Application::Render(void)
     
     //lab02
     framebuffer.Fill(Color::BLACK);
-    entity1->Render(&framebuffer, camera, Color::WHITE);
-    entity2->Render(&framebuffer, camera, Color::RED);
-    entity3->Render(&framebuffer, camera, Color::GREEN);
+
+    if (scene_mode == 1) {
+        entity1->Render(&framebuffer, camera, Color::WHITE);
+    }
+    else {
+        entity1->Render(&framebuffer, camera, Color::WHITE);
+        entity2->Render(&framebuffer, camera, Color::RED);
+        entity3->Render(&framebuffer, camera, Color::GREEN);
+    }
+
     framebuffer.Render();
+
 }
 
 // Called after render
@@ -209,7 +219,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
     // KEY CODES: https://wiki.libsdl.org/SDL2/SDL_Keycode
     switch(event.keysym.sym) {
         case SDLK_ESCAPE: exit(0); break; // ESC key, kill the app
-        case SDLK_1:
+        /*case SDLK_1:
             paint_active = true;
             animation_active = false;
             framebuffer.Fill(Color::BLACK);
@@ -226,7 +236,49 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             break;
         case SDLK_MINUS:
             current_border--;
+            break;*/
+        case SDLK_1:
+            scene_mode = 1;
             break;
+
+        case SDLK_2:
+            scene_mode = 2;
+            break;
+
+        case SDLK_n:
+            current_property = CAM_NEAR;
+            break;
+
+        case SDLK_f:
+            current_property = CAM_FAR;
+            break;
+
+        case SDLK_v:
+            current_property = CAM_FOV;
+            break;
+            
+        case SDLK_PLUS:
+            if (current_property == CAM_NEAR)
+                camera->near_plane += 0.1f;
+            else if (current_property == CAM_FAR)
+                camera->far_plane += 1.0f;
+            else if (current_property == CAM_FOV)
+                camera->fov += 1.0f;
+
+            camera->UpdateProjectionMatrix();
+            break;
+        
+        case SDLK_KP_MINUS:
+            if (current_property == CAM_NEAR)
+                camera->near_plane = std::max(0.01f, camera->near_plane - 0.1f);
+            else if (current_property == CAM_FAR)
+                camera->far_plane -= 1.0f;
+            else if (current_property == CAM_FOV)
+                camera->fov -= 1.0f;
+
+            camera->UpdateProjectionMatrix();
+            break;
+        
     }
 }
 
@@ -300,7 +352,8 @@ void Application::OnMouseButtonUp(SDL_MouseButtonEvent event)
 
 void Application::OnMouseMove(SDL_MouseButtonEvent event)
 {
-    mouse_delta = mouse_position; //guardem la posició anterior abans d'actualitzar-la
+    //lab01
+    /*mouse_delta = mouse_position; //guardem la posició anterior abans d'actualitzar-la
     
     mouse_position.x = event.x;
     mouse_position.y = framebuffer.height - event.y; //totes les posicions del ratolí s'han d'invertir perque van al revés que les imatges
@@ -312,14 +365,37 @@ void Application::OnMouseMove(SDL_MouseButtonEvent event)
         else if(eraser_active){
             framebuffer.DrawLineDDA(mouse_delta.x, mouse_delta.y, mouse_position.x, mouse_position.y, Color::BLACK);
         }
+    }*/
+    
+    //lab02
+    if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT)){ //eye
+        float dx = event.x * 0.01f;
+        float dy = event.y * 0.01f;
+
+        camera->Rotate(dx, Vector3(0,1,0));
+        camera->Rotate(-dy, Vector3(1,0,0));
+    }
+    
+    if (mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)) { //center
+        float dx = event.x * 0.01f;
+        float dy = event.y * 0.01f;
+
+        camera->center.x -= dx;
+        camera->center.y += dy;
+
+        camera->UpdateViewMatrix();
     }
 }
 
 void Application::OnWheel(SDL_MouseWheelEvent event)
 {
-    float dy = event.preciseY;
+    float dy = event.preciseY * 0.5f;
+    
+    Vector3 dir = camera->center - camera->eye; //distancia entre a i e
+    dir.Normalize();
 
-    // ...
+    camera->eye = camera->eye + dir * dy;
+    camera->UpdateViewMatrix();
 }
 
 void Application::OnFileChanged(const char* filename)

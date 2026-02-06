@@ -94,8 +94,10 @@ void Camera::UpdateViewMatrix()
     rotation.SetIdentity();
     translation.SetIdentity();
     
-    Vector3 z_cam = (center - eye).Normalize();
-    Vector3 x_cam = up.Cross(z_cam).Normalize();
+    Vector3 z_cam = center - eye;
+    z_cam.Normalize();
+    Vector3 x_cam = up.Cross(z_cam);
+    x_cam.Normalize();
     Vector3 y_cam = z_cam.Cross(x_cam);
     
     rotation.M[0][0] = x_cam.x;
@@ -109,6 +111,8 @@ void Camera::UpdateViewMatrix()
     rotation.M[2][0] = -z_cam.x;
     rotation.M[2][1] = -z_cam.y;
     rotation.M[2][2] = -z_cam.z;
+    
+    rotation.M[3][3] = 1.0f;
     
     translation.MakeTranslationMatrix(-eye.x, -eye.y, -eye.z);
 

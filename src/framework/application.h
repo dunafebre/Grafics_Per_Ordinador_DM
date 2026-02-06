@@ -45,6 +45,8 @@ public:
     Entity* entity2;
     Entity* entity3;
     Camera* camera;
+    CameraProperty current_property;
+    int scene_mode = 1;
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);

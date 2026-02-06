@@ -20,9 +20,9 @@ public:
     Matrix44 model;
     AnimationType animType;
     
-    Entity(Mesh m, Matrix44 md, AnimationType at)
+    Entity(Mesh* m, const Matrix44& md, AnimationType at)
     {
-        mesh = &m;
+        mesh = m;
         model = md;
         animType = at;
     }

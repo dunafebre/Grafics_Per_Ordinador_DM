@@ -39,6 +39,7 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
         int x2 = (int)((v2.x + 1.0f) * 0.5f * framebuffer->width);
         int y2 = (int)((v2.y + 1.0f) * 0.5f * framebuffer->height);
 
+
         //dibuixar linies
         framebuffer->DrawLineDDA(x0, y0, x1, y1, c);
         framebuffer->DrawLineDDA(x1, y1, x2, y2, c);
@@ -71,7 +72,7 @@ void Entity::Update(float seconds_elapsed)
 
         case SCALE:
         {
-            float s = cos(seconds_elapsed) + 1.5f;
+            float s = cos(seconds_elapsed) + 0.2f;
             Matrix44 scale;
             scale.MakeScaleMatrix(s, s, s);
             model = scale;

@@ -21,9 +21,9 @@ public:
 	char type;
 
 	// Vectors to define the orientation of the camera
-	Vector3 eye;	// Where is the camera
-	Vector3 center; // Where is it pointing
-	Vector3 up;		// The up pointing up
+	Vector3 eye;	// Where is the camera, e
+	Vector3 center; // Where is it pointing, a
+	Vector3 up;		// The up pointing up, u
 
 	// Properties of the projection of the camera
 	float fov;			// View angle in degrees (1/zoom)
@@ -66,3 +66,13 @@ public:
 
 	Matrix44 GetViewProjectionMatrix();
 };
+
+enum CameraProperty {
+    CAM_NEAR,
+    CAM_FAR,
+    CAM_FOV
+};
+
+
+
+
