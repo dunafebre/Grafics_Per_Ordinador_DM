@@ -162,7 +162,7 @@ void Application::Init(void)
     camera->UpdateProjectionMatrix();
     camera->UpdateViewProjectionMatrix();
     
-    current_property = CAM_FOV;
+    current_property = CAM_FAR;
     scene_mode = 1;
 }
 
@@ -249,11 +249,11 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             scene_mode = 2;
             break;
 
-        case SDLK_n:
+        case SDL_SCANCODE_N:
             current_property = CAM_NEAR;
             break;
 
-        case SDLK_f:
+        case SDL_SCANCODE_F:
             current_property = CAM_FAR;
             break;
 
@@ -262,14 +262,19 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             break;
             
         case SDLK_PLUS:
-            if (current_property == CAM_NEAR)
+            if (current_property == CAM_NEAR){
                 camera->near_plane += 0.1f;
-            else if (current_property == CAM_FAR)
+            }
+            else if (current_property == CAM_FAR){
                 camera->far_plane += 1.0f;
-            else if (current_property == CAM_FOV)
+            }
+            else if (current_property == CAM_FOV){
                 camera->fov += 1.0f;
+            }
+                
 
             camera->UpdateProjectionMatrix();
+            camera->UpdateViewProjectionMatrix();
             break;
         
         case SDLK_MINUS:
@@ -281,6 +286,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 camera->fov -= 1.0f;
 
             camera->UpdateProjectionMatrix();
+            camera->UpdateViewProjectionMatrix();
             break;
         
     }
@@ -376,18 +382,24 @@ void Application::OnMouseMove(SDL_MouseButtonEvent event)
      
     mouse_position.x = event.x;
     mouse_position.y = framebuffer.height - event.y;
-    if(mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)){ //a
-        float dx = (mouse_position.x - mouse_delta.x) * 0.01f;
-        float dy = (mouse_position.y - mouse_delta.y) * 0.01f;
-
-        camera->Rotate(dx, Vector3(0,1,0));
-        camera->Rotate(-dy, Vector3(1,0,0));
-    }
+    float dx = (mouse_position.x - mouse_delta.x) * 0.01f;
+    float dy = (mouse_position.y - mouse_delta.y) * 0.01f;
     
-    else if (mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT)) { //e
-        float dx = (mouse_position.x - mouse_delta.x) * 0.01f;
-        float dy = (mouse_position.y - mouse_delta.y) * 0.01f;
+    if(mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT)){
+        Vector3 dir = camera->eye - camera->center;
 
+        Matrix44 rotY;
+        rotY.MakeRotationMatrix(dx, Vector3(0,1,0));
+        dir = rotY * dir;
+
+        Matrix44 rotX;
+        rotX.MakeRotationMatrix(dy, Vector3(1,0,0));
+        dir = rotX * dir;
+
+        camera->eye = camera->center + dir;
+        camera->UpdateViewMatrix();
+    }
+    else if (mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
         camera->center.x -= dx;
         camera->center.y += dy;
 
