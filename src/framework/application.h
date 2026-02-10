@@ -58,6 +58,9 @@ public:
 
 	// CPU Global framebuffer
 	Image framebuffer;
+    
+    // Z-buffer
+    FloatImage zBuffer;
 
 	// Constructor and main methods
 	Application(const char* caption, int width, int height);
@@ -73,6 +76,7 @@ public:
 		this->window_width = width;
 		this->window_height = height;
 		this->framebuffer.Resize(width, height);
+        this->zBuffer.Resize(width, height);
         
         if (camera)
         {

@@ -17,6 +17,7 @@ Application::Application(const char* caption, int width, int height)
     this->keystate = SDL_GetKeyboardState(nullptr);
 
     this->framebuffer.Resize(w, h);
+    this->zBuffer.Resize(w, h);
 }
 
 Application::~Application()
@@ -137,21 +138,30 @@ void Application::Init(void)
     
     ps.Init();*/
     
-    //lab02
+    //lab02 i lab03
     Mesh* mesh1 = new Mesh();
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
-    entity1 = new Entity(mesh1, model1, SCALE);
+    Image* tex1 = new Image();
+    tex1->LoadTGA("textures/lee_color_specular.tga", true);
+    //entity1 = new Entity(mesh1, model1, SCALE);
+    entity1 = new Entity(mesh1, model1, tex1, ZERO);
     
     Mesh* mesh2 = new Mesh();
     mesh2->LoadOBJ("meshes/anna.obj");
     Matrix44 model2;
-    entity2 = new Entity(mesh2, model2, TRANSLATE);
+    Image* tex2 = new Image();
+    tex2->LoadTGA("textures/anna_color_specular.tga", true);
+    //entity2 = new Entity(mesh2, model2, ROTATE);
+    entity2 = new Entity(mesh2, model2, tex2, ZERO);
     
     Mesh* mesh3 = new Mesh();
     mesh3->LoadOBJ("meshes/cleo.obj");
     Matrix44 model3;
-    entity3 = new Entity(mesh3, model3, ROTATE);
+    Image* tex3 = new Image();
+    tex3->LoadTGA("textures/cleo_color_specular.tga", true);
+    //entity3 = new Entity(mesh3, model3, TRANSLATE);
+    entity3 = new Entity(mesh2, model2, tex3, ZERO);
     
     camera = new Camera();
 
@@ -164,6 +174,8 @@ void Application::Init(void)
     
     current_property = CAM_FAR;
     scene_mode = 1;
+    
+    zBuffer.Resize(framebuffer.width, framebuffer.height);
 }
 
 // Render one frame
@@ -185,14 +197,15 @@ void Application::Render(void)
     
     //lab02
     framebuffer.Fill(Color::BLACK);
+    zBuffer.Fill(1e9f); //inicialitzem el z-buffer a un numero molt gran
 
     if (scene_mode == 1) {
-        entity1->Render(&framebuffer, camera, Color::WHITE);
+        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
     }
     else if (scene_mode == 2){
-        entity1->Render(&framebuffer, camera, Color::WHITE);
-        entity2->Render(&framebuffer, camera, Color::RED);
-        entity3->Render(&framebuffer, camera, Color::GREEN);
+        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
+        entity2->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
+        entity3->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
     }
 
     framebuffer.Render();

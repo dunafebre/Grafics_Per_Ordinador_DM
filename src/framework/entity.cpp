@@ -10,7 +10,7 @@
 #include <cstring>
 #include <iostream>
 
-void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
+void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer)
 {
     for (int i = 0; i < mesh->vertices.size(); i += 3)
     {
@@ -18,6 +18,10 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
         Vector3 v0 = model * mesh->vertices[i];
         Vector3 v1 = model * mesh->vertices[i + 1];
         Vector3 v2 = model * mesh->vertices[i + 2];
+        
+        Vector2 uv0 = mesh->uvs[i];
+        Vector2 uv1 = mesh->uvs[i + 1];
+        Vector2 uv2 = mesh->uvs[i + 2];
         
         //world -> view -> clip
         v0 = camera->ProjectVector(v0);
@@ -41,9 +45,31 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c)
 
 
         //dibuixar linies
-        framebuffer->DrawLineDDA(x0, y0, x1, y1, c);
+        /*framebuffer->DrawLineDDA(x0, y0, x1, y1, c);
         framebuffer->DrawLineDDA(x1, y1, x2, y2, c);
-        framebuffer->DrawLineDDA(x2, y2, x0, y0, c);
+        framebuffer->DrawLineDDA(x2, y2, x0, y0, c);*/
+        Vector3 p0 = Vector3(x0, y0, v0.z);
+        Vector3 p1 = Vector3(x1, y1, v1.z);
+        Vector3 p2 = Vector3(x2, y2, v2.z);
+        
+        //framebuffer->DrawTriangle(p0,p1,p2,c,true,c);
+        
+        sTriangleInfo triangle;
+        triangle.p0 = p0;
+        triangle.p1 = p1;
+        triangle.p2 = p2;
+
+        triangle.uv0 = uv0;
+        triangle.uv1 = uv1;
+        triangle.uv2 = uv2;
+
+        triangle.c0 = c0;
+        triangle.c1 = c1;
+        triangle.c2 = c2;
+
+        triangle.texture = texture;
+        
+        framebuffer->DrawTriangleInterpolated(triangle,zBuffer);
     }
 }
 
@@ -53,28 +79,31 @@ void Entity::Update(float seconds_elapsed)
     {
         case ROTATE:
         {
+            float angle = 3.141592f * 0.25f * seconds_elapsed;
             Matrix44 rotation;
             rotation.SetIdentity();
-            rotation.MakeRotationMatrix(3.141592f * 0.25f, Vector3(0,1,0));
-            model = rotation;
+            rotation.MakeRotationMatrix(angle, Vector3(0,1,0));
+            model = model * rotation;
             break;
         }
 
         case TRANSLATE:
         {
+            float dx = -0.4f * seconds_elapsed;
             Matrix44 translation;
             translation.SetIdentity();
-            translation.MakeTranslationMatrix(-0.4f, 0.0f, 0.0f);
-            model = translation;
+            translation.MakeTranslationMatrix(dx, 0.0f, 0.0f);
+            model = model * translation;
             break;
         }
 
         case SCALE:
         {
+            float scaleFactor = 1.0f + (0.5f - 1.0f) * seconds_elapsed;
             Matrix44 scale;
             scale.SetIdentity();
-            scale.MakeScaleMatrix(0.5f, 0.5f, 0.5f);
-            model = scale;
+            scale.MakeScaleMatrix(scaleFactor, scaleFactor, scaleFactor);
+            model = model * scale;
             break;
         }
         

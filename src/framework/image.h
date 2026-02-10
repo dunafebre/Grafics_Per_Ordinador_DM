@@ -20,7 +20,13 @@ class FloatImage;
 class Entity;
 class Camera;
 class Button;
-
+class Image;
+struct sTriangleInfo {
+    Vector3 p0,p1,p2;
+    Vector2 uv0,uv1,uv2;
+    Color c0,c1,c2;
+    Image* texture;
+};
 // A matrix of pixels
 class Image
 {
@@ -91,6 +97,7 @@ public:
     void DrawTriangle(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Color& borderColor, bool isFilled, const Color& fillColor);
     void ScanLineDDA(int x0, int y0, int x1, int y1, std::vector<Cell>& table, int minY);
     void DrawImage(const Image& image, int x, int y);
+    void DrawTriangleInterpolated(const sTriangleInfo& triangle, FloatImage* zBuffer);
 
     // Used to easy code
     #ifndef IGNORE_LAMBDAS
@@ -107,7 +114,6 @@ public:
     }
     #endif
 };
-
 // Image storing one float per pixel instead of a 3 or 4 component Color
 
 class FloatImage
