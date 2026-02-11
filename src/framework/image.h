@@ -26,6 +26,9 @@ struct sTriangleInfo {
     Vector2 uv0,uv1,uv2;
     Color c0,c1,c2;
     Image* texture;
+    bool useTexture = true;
+    bool useZBuffer = true;
+    bool useInterpolatedUV = true;
 };
 // A matrix of pixels
 class Image

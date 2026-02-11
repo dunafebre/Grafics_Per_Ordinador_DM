@@ -16,13 +16,20 @@ enum AnimationType {
     SCALE
 };
 
+enum class eRenderMode {
+    POINTCLOUD,
+    WIREFRAME,
+    TRIANGLES,
+    TRIANGLES_INTERPOLATED
+};
+
 class Entity {
 public:
     Mesh* mesh;
     Matrix44 model;
     Image* texture;
     AnimationType animType;
-    
+
     Entity(Mesh* m, const Matrix44& md, Image* t, AnimationType at)
     {
         mesh = m;
@@ -31,7 +38,9 @@ public:
         animType = at;
     }
 
-    void Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer);
+    void Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode);
     void Update(float seconds_elapsed);
     
 };
+
+

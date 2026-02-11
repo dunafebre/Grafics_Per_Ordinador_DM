@@ -47,6 +47,12 @@ public:
     Camera* camera;
     CameraProperty current_property;
     int scene_mode = 1;
+    
+    //lab3
+    bool useTexture = true;
+    bool useZBuffer = true;
+    bool useInterpolatedUV = true;
+    eRenderMode mode = eRenderMode::TRIANGLES_INTERPOLATED;
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);

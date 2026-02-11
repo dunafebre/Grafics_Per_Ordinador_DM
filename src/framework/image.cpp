@@ -6,6 +6,7 @@
 #include "GL/glew.h"
 #include "../extra/picopng.h"
 #include "image.h"
+#include "application.h"
 #include "utils.h"
 #include "camera.h"
 #include "mesh.h"
@@ -517,64 +518,53 @@ void Image::DrawImage(const Image& image, int x, int y)
 
 void Image::DrawTriangleInterpolated(const sTriangleInfo& triangle, FloatImage* zBuffer){
     
+    Vector3 A = triangle.p0;
+    Vector3 B = triangle.p1;
+    Vector3 C = triangle.p2;
+    
     int minY = std::min({triangle.p0.y, triangle.p1.y, triangle.p2.y});
     int maxY = std::max({triangle.p0.y, triangle.p1.y, triangle.p2.y});
-    int height_ = maxY - minY + 1;
-    std::vector<Cell> table(height_);
-   
-    ScanLineDDA(triangle.p0.x, triangle.p0.y, triangle.p1.x, triangle.p1.y, table, minY);
-    ScanLineDDA(triangle.p1.x, triangle.p1.y, triangle.p2.x, triangle.p2.y, table, minY);
-    ScanLineDDA(triangle.p2.x, triangle.p2.y, triangle.p0.x, triangle.p0.y, table, minY);
-   
-    float alpha = 0;
-    float beta = 0;
-    float gamma = 0;
+    int minX = std::min({triangle.p0.x, triangle.p1.x, triangle.p2.x});
+    int maxX = std::max({triangle.p0.x, triangle.p1.x, triangle.p2.x});
     
-    Vector3 v0 = triangle.p1 - triangle.p0;
-    Vector3 v1 = triangle.p2 - triangle.p0;
+    float area_total = (B - A).Cross(C - A).z;
 
-    Vector3 cross = v0.Cross(v1);
-    float area_total = 0.5f * sqrt(cross.x * cross.x + cross.y * cross.y + cross.z * cross.z);
-
-    for(int i = 0; i < height_; i++) {
-        int y = i + minY;
-        for(int x = table[i].minx; x <= table[i].maxx; x++){
+    for (int y = minY; y <= maxY; y++){
+        for (int x = minX; x <= maxX; x++){
             Vector3 P(x + 0.5f, y + 0.5f, 0);
             
-            Vector3 v0 = triangle.p1 - triangle.p2;
-            Vector3 v1 = P - triangle.p2;
+            float area_A0 = (B - P).Cross(C - P).z;
+            float area_A1 = (C - P).Cross(A - P).z;
+            float area_A2 = (A - P).Cross(B - P).z;
 
-            Vector3 cross = v0.Cross(v1);
-            float area_A0 = 0.5f * sqrt(cross.x * cross.x + cross.y * cross.y + cross.z * cross.z);
+            float alpha = area_A0 / area_total;
+            float beta = area_A1 / area_total;
             
-            alpha = area_A0 / area_total;
-            
-            v0 = triangle.p2 - triangle.p0;
-            v1 = P - triangle.p0;
-
-            cross = v0.Cross(v1);
-            float area_A1 = 0.5f * sqrt(cross.x * cross.x + cross.y * cross.y + cross.z * cross.z);
-            
-            beta = area_A1 / area_total;
-            
-            gamma = 1.0f - alpha - beta;
+            float gamma = 1.0f - alpha - beta;
             
             if (alpha > 1 || alpha < 0 || beta > 1 || beta < 0 || gamma > 1|| gamma < 0)
                 continue;
             
-            float z = alpha * triangle.p0.z + beta * triangle.p1.z + gamma * triangle.p2.z;
+            if(triangle.useZBuffer){
+                float z = alpha * triangle.p0.z + beta * triangle.p1.z + gamma * triangle.p2.z;
+                float& zb = zBuffer->GetPixelRef(x, y);
+                if (z >= zb)
+                    continue;
+                zb = z;
+            }
             
-            float& zb = zBuffer->GetPixelRef(x, y);
-            if (z >= zb)
-                continue;
-            zb = z;
-            //Color final_color = alpha * triangle.c0 + beta * triangle.c1 + gamma * triangle.c2;
-            //SetPixel(x,y, final_color);
-            Vector2 uv = triangle.uv0 * alpha + triangle.uv1 * beta + triangle.uv2 * gamma;
-            float tx = uv.x * (triangle.texture->width - 1);
-            float ty = uv.y * (triangle.texture->height - 1);
-            Color texColor = triangle.texture->GetPixelSafe((int)tx, (int)ty);
-            SetPixel(x, y, texColor);
+            if(triangle.useTexture == false){
+                Color final_color = alpha * triangle.c0 + beta * triangle.c1 + gamma * triangle.c2;
+                SetPixel(x,y, final_color);
+            }
+            else {
+                Vector2 uv = triangle.uv0 * alpha + triangle.uv1 * beta + triangle.uv2 * gamma;
+                float tx = uv.x * (triangle.texture->width - 1);
+                float ty = uv.y * (triangle.texture->height - 1);
+                Color texColor = triangle.texture->GetPixelSafe((int)tx, (int)ty);
+                SetPixel(x, y, texColor);
+            }
+            
         }
     }
 }

@@ -150,6 +150,8 @@ void Application::Init(void)
     Mesh* mesh2 = new Mesh();
     mesh2->LoadOBJ("meshes/anna.obj");
     Matrix44 model2;
+    model2.SetIdentity();
+    model2.MakeTranslationMatrix(0.4, 0.0f, 0.0f);
     Image* tex2 = new Image();
     tex2->LoadTGA("textures/anna_color_specular.tga", true);
     //entity2 = new Entity(mesh2, model2, ROTATE);
@@ -158,10 +160,12 @@ void Application::Init(void)
     Mesh* mesh3 = new Mesh();
     mesh3->LoadOBJ("meshes/cleo.obj");
     Matrix44 model3;
+    model3.SetIdentity();
+    model3.MakeTranslationMatrix(-0.4, 0.0f, 0.0f);
     Image* tex3 = new Image();
     tex3->LoadTGA("textures/cleo_color_specular.tga", true);
     //entity3 = new Entity(mesh3, model3, TRANSLATE);
-    entity3 = new Entity(mesh2, model2, tex3, ZERO);
+    entity3 = new Entity(mesh3, model3, tex3, ZERO);
     
     camera = new Camera();
 
@@ -200,12 +204,12 @@ void Application::Render(void)
     zBuffer.Fill(1e9f); //inicialitzem el z-buffer a un numero molt gran
 
     if (scene_mode == 1) {
-        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
+        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
     }
     else if (scene_mode == 2){
-        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
-        entity2->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
-        entity3->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer);
+        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
+        entity2->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
+        entity3->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
     }
 
     framebuffer.Render();
@@ -302,6 +306,30 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             camera->UpdateViewProjectionMatrix();
             break;
         
+        case SDL_SCANCODE_T:
+            if (useTexture){
+                useTexture = false;
+            }
+            else{
+                useTexture = true;
+            }
+            break;
+        case SDL_SCANCODE_Z:
+            if (useZBuffer){
+                useZBuffer = false;
+            }
+            else{
+                useZBuffer = true;
+            }
+            break;
+        case SDL_SCANCODE_C:
+            if (useInterpolatedUV){
+                useInterpolatedUV = false;
+            }
+            else{
+                useInterpolatedUV = true;
+            }
+            break;
     }
 }
 

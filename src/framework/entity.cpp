@@ -10,7 +10,7 @@
 #include <cstring>
 #include <iostream>
 
-void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer)
+void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode)
 {
     for (int i = 0; i < mesh->vertices.size(); i += 3)
     {
@@ -43,16 +43,9 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const C
         int x2 = (int)((v2.x + 1.0f) * 0.5f * framebuffer->width);
         int y2 = (int)((v2.y + 1.0f) * 0.5f * framebuffer->height);
 
-
-        //dibuixar linies
-        /*framebuffer->DrawLineDDA(x0, y0, x1, y1, c);
-        framebuffer->DrawLineDDA(x1, y1, x2, y2, c);
-        framebuffer->DrawLineDDA(x2, y2, x0, y0, c);*/
         Vector3 p0 = Vector3(x0, y0, v0.z);
         Vector3 p1 = Vector3(x1, y1, v1.z);
         Vector3 p2 = Vector3(x2, y2, v2.z);
-        
-        //framebuffer->DrawTriangle(p0,p1,p2,c,true,c);
         
         sTriangleInfo triangle;
         triangle.p0 = p0;
@@ -69,7 +62,25 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const C
 
         triangle.texture = texture;
         
-        framebuffer->DrawTriangleInterpolated(triangle,zBuffer);
+        if(mode == eRenderMode::POINTCLOUD){
+            framebuffer->SetPixel(p0.x, p0.y, c0);
+            framebuffer->SetPixel(p1.x, p1.y, c1);
+            framebuffer->SetPixel(p2.x, p2.y, c2);
+        }
+        else if(mode == eRenderMode::WIREFRAME){
+            framebuffer->DrawLineDDA(x0, y0, x1, y1, c0);
+            framebuffer->DrawLineDDA(x1, y1, x2, y2, c1);
+            framebuffer->DrawLineDDA(x2, y2, x0, y0, c2);
+        }
+        else if(mode == eRenderMode::TRIANGLES){
+            Vector2 p0 = Vector2(x0, y0);
+            Vector2 p1 = Vector2(x1, y1);
+            Vector2 p2 = Vector2(x2, y2);
+            framebuffer->DrawTriangle(p0,p1,p2,c0,true,c0);
+        }
+        else if(mode == eRenderMode::TRIANGLES_INTERPOLATED){
+            framebuffer->DrawTriangleInterpolated(triangle,zBuffer);
+        }
     }
 }
 
@@ -109,9 +120,9 @@ void Entity::Update(float seconds_elapsed)
         
         case ZERO:
         {
-            Matrix44 null;
+            /*Matrix44 null;
             null.SetIdentity();
-            model = null;
+            model = null;*/
         }
     }
 }
