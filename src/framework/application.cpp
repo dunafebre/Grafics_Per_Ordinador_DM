@@ -1,4 +1,5 @@
 #include "application.h"
+#include "image.h"
 #include "mesh.h"
 #include "shader.h"
 #include "utils.h"
@@ -204,12 +205,12 @@ void Application::Render(void)
     zBuffer.Fill(1e9f); //inicialitzem el z-buffer a un numero molt gran
 
     if (scene_mode == 1) {
-        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
+        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode, useTexture, useZBuffer, useInterpolatedUV);
     }
     else if (scene_mode == 2){
-        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
-        entity2->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
-        entity3->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode);
+        entity1->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode, useTexture, useZBuffer, useInterpolatedUV);
+        entity2->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode, useTexture, useZBuffer, useInterpolatedUV);
+        entity3->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode, useTexture, useZBuffer, useInterpolatedUV);
     }
 
     framebuffer.Render();
@@ -306,7 +307,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             camera->UpdateViewProjectionMatrix();
             break;
         
-        case SDL_SCANCODE_T:
+        case SDLK_t:
             if (useTexture){
                 useTexture = false;
             }
@@ -314,7 +315,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 useTexture = true;
             }
             break;
-        case SDL_SCANCODE_Z:
+        case SDLK_z:
             if (useZBuffer){
                 useZBuffer = false;
             }
@@ -322,12 +323,22 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 useZBuffer = true;
             }
             break;
-        case SDL_SCANCODE_C:
+        case SDLK_c:
             if (useInterpolatedUV){
+                mode = eRenderMode::TRIANGLES;
                 useInterpolatedUV = false;
             }
             else{
+                mode = eRenderMode::TRIANGLES_INTERPOLATED;
                 useInterpolatedUV = true;
+            }
+            break;
+        case SDLK_w:
+            if (mode != eRenderMode::WIREFRAME){
+                mode = eRenderMode::WIREFRAME;
+            }
+            else if(mode != eRenderMode::TRIANGLES){
+                mode = eRenderMode::TRIANGLES;
             }
             break;
     }

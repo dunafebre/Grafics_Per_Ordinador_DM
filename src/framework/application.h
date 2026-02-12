@@ -53,6 +53,7 @@ public:
     bool useZBuffer = true;
     bool useInterpolatedUV = true;
     eRenderMode mode = eRenderMode::TRIANGLES_INTERPOLATED;
+    
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);

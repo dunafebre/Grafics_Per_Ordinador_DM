@@ -10,7 +10,7 @@
 #include <cstring>
 #include <iostream>
 
-void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode)
+void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode, bool useTexture, bool useZBuffer, bool useInterpolatedUV)
 {
     for (int i = 0; i < mesh->vertices.size(); i += 3)
     {
@@ -79,7 +79,7 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const C
             framebuffer->DrawTriangle(p0,p1,p2,c0,true,c0);
         }
         else if(mode == eRenderMode::TRIANGLES_INTERPOLATED){
-            framebuffer->DrawTriangleInterpolated(triangle,zBuffer);
+            framebuffer->DrawTriangleInterpolated(triangle,zBuffer,useTexture, useZBuffer, useInterpolatedUV);
         }
     }
 }

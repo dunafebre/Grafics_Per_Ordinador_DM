@@ -38,7 +38,7 @@ public:
         animType = at;
     }
 
-    void Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode);
+    void Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode, bool useTexture, bool useZBuffer, bool useInterpolatedUV);
     void Update(float seconds_elapsed);
     
 };

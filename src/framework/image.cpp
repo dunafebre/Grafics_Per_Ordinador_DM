@@ -516,7 +516,7 @@ void Image::DrawImage(const Image& image, int x, int y)
     }
 }
 
-void Image::DrawTriangleInterpolated(const sTriangleInfo& triangle, FloatImage* zBuffer){
+void Image::DrawTriangleInterpolated(const sTriangleInfo& triangle, FloatImage* zBuffer, bool useTexture, bool useZBuffer, bool useInterpolatedUV){
     
     Vector3 A = triangle.p0;
     Vector3 B = triangle.p1;
@@ -545,7 +545,7 @@ void Image::DrawTriangleInterpolated(const sTriangleInfo& triangle, FloatImage* 
             if (alpha > 1 || alpha < 0 || beta > 1 || beta < 0 || gamma > 1|| gamma < 0)
                 continue;
             
-            if(triangle.useZBuffer){
+            if(useZBuffer){
                 float z = alpha * triangle.p0.z + beta * triangle.p1.z + gamma * triangle.p2.z;
                 float& zb = zBuffer->GetPixelRef(x, y);
                 if (z >= zb)
@@ -553,18 +553,22 @@ void Image::DrawTriangleInterpolated(const sTriangleInfo& triangle, FloatImage* 
                 zb = z;
             }
             
-            if(triangle.useTexture == false){
+            if(!useTexture){
                 Color final_color = alpha * triangle.c0 + beta * triangle.c1 + gamma * triangle.c2;
                 SetPixel(x,y, final_color);
             }
-            else {
-                Vector2 uv = triangle.uv0 * alpha + triangle.uv1 * beta + triangle.uv2 * gamma;
-                float tx = uv.x * (triangle.texture->width - 1);
-                float ty = uv.y * (triangle.texture->height - 1);
-                Color texColor = triangle.texture->GetPixelSafe((int)tx, (int)ty);
-                SetPixel(x, y, texColor);
+            else if(useTexture){
+                if(useInterpolatedUV){
+                    Vector2 uv = triangle.uv0 * alpha + triangle.uv1 * beta + triangle.uv2 * gamma;
+                    float tx = uv.x * (triangle.texture->width - 1);
+                    float ty = uv.y * (triangle.texture->height - 1);
+                    Color texColor = triangle.texture->GetPixelSafe((int)tx, (int)ty);
+                    SetPixel(x, y, texColor);
+                }
+                else if(!useInterpolatedUV){
+                    SetPixel(x, y, triangle.c0);
+                }
             }
-            
         }
     }
 }
