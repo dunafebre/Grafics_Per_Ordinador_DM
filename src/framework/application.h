@@ -9,6 +9,7 @@
 #include "image.h"
 #include "entity.h"
 #include "mesh.h"
+#include "shader.h"
 
 class Application
 {
@@ -40,7 +41,7 @@ public:
     int current_border = 1;
     ParticleSystem ps;
     
-    //lab2
+    //lab02
     Entity* entity1;
     Entity* entity2;
     Entity* entity3;
@@ -48,11 +49,15 @@ public:
     CameraProperty current_property;
     int scene_mode = 1;
     
-    //lab3
+    //lab03
     bool useTexture = true;
     bool useZBuffer = true;
     bool useInterpolatedUV = true;
     eRenderMode mode = eRenderMode::TRIANGLES_INTERPOLATED;
+    
+    //lab04
+    Mesh* mesh;
+    Shader* shader;
     
 
 	void OnKeyPressed(SDL_KeyboardEvent event);

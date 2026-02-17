@@ -181,6 +181,13 @@ void Application::Init(void)
     scene_mode = 1;
     
     zBuffer.Resize(framebuffer.width, framebuffer.height);
+    
+    //lab04
+    mesh = new Mesh();
+    mesh->CreateQuad();
+
+    shader = Shader::Get("shaders/shader.vs","shaders/shader.fs");
+
 }
 
 // Render one frame
@@ -201,7 +208,7 @@ void Application::Render(void)
     }*/
     
     //lab02
-    framebuffer.Fill(Color::BLACK);
+    /*framebuffer.Fill(Color::BLACK);
     zBuffer.Fill(1e9f); //inicialitzem el z-buffer a un numero molt gran
 
     if (scene_mode == 1) {
@@ -212,8 +219,16 @@ void Application::Render(void)
         entity2->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode, useTexture, useZBuffer, useInterpolatedUV);
         entity3->Render(&framebuffer, camera, Color::RED, Color::BLUE, Color::GREEN, &zBuffer, mode, useTexture, useZBuffer, useInterpolatedUV);
     }
+    framebuffer.Render();*/
+    
+    //lab04
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //equivalent a Fill Color i Fill z-Buffer
+    
+    shader->Enable();
+    mesh->Render();
+    shader->Disable();
 
-    framebuffer.Render();
+    
 
 }
 

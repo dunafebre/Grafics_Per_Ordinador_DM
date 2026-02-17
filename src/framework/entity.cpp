@@ -79,7 +79,7 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const C
             framebuffer->DrawTriangle(p0,p1,p2,c0,true,c0);
         }
         else if(mode == eRenderMode::TRIANGLES_INTERPOLATED){
-            framebuffer->DrawTriangleInterpolated(triangle,zBuffer,useTexture, useZBuffer, useInterpolatedUV);
+            framebuffer->DrawTriangleInterpolated(triangle,zBuffer,useTexture,useZBuffer, useInterpolatedUV);
         }
     }
 }
