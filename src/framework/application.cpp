@@ -186,7 +186,7 @@ void Application::Init(void)
     mesh = new Mesh();
     mesh->CreateQuad();
 
-    shader = Shader::Get("shaders/shader.vs","shaders/shader.fs");
+    shader = Shader::Get("shaders/quad.vs","shaders/quad.fs");
 
 }
 
@@ -225,10 +225,10 @@ void Application::Render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //equivalent a Fill Color i Fill z-Buffer
     
     shader->Enable();
-    mesh->Render();
+    mesh->Render(GL_TRIANGLES);
     shader->Disable();
 
-    
+    SDL_GL_SwapWindow(window);
 
 }
 
