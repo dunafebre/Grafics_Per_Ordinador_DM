@@ -140,7 +140,7 @@ void Application::Init(void)
     ps.Init();*/
     
     //lab02 i lab03
-    Mesh* mesh1 = new Mesh();
+    /*Mesh* mesh1 = new Mesh();
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
     Image* tex1 = new Image();
@@ -180,13 +180,20 @@ void Application::Init(void)
     current_property = CAM_FAR;
     scene_mode = 1;
     
-    zBuffer.Resize(framebuffer.width, framebuffer.height);
+    zBuffer.Resize(framebuffer.width, framebuffer.height);*/
     
     //lab04
     mesh = new Mesh();
     mesh->CreateQuad();
 
     shader = Shader::Get("shaders/quad.vs","shaders/quad.fs");
+
+    Image* myImage = new Image();
+    myImage->LoadPNG("images/fruits.png");
+    
+    glGenTextures(1, &texID);
+    glBindTexture(GL_TEXTURE_2D, texID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, myImage->width, myImage->height, 0, GL_RGB, GL_UNSIGNED_BYTE, myImage->pixels);
 
 }
 
@@ -225,10 +232,9 @@ void Application::Render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //equivalent a Fill Color i Fill z-Buffer
     
     shader->Enable();
+    shader->SetTexture("u_texture", texID);
     mesh->Render(GL_TRIANGLES);
     shader->Disable();
-
-    SDL_GL_SwapWindow(window);
 
 }
 
@@ -239,14 +245,14 @@ void Application::Update(float seconds_elapsed)
     /*ps.Update(seconds_elapsed);*/
     
     //lab02
-    if (scene_mode == 1) {
+    /*if (scene_mode == 1) {
         entity1->Update(seconds_elapsed);
     }
     else if (scene_mode == 2) {
         entity1->Update(seconds_elapsed);
         entity2->Update(seconds_elapsed);
         entity3->Update(seconds_elapsed);
-    }
+    }*/
 
 }
 

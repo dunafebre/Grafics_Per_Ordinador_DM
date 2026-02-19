@@ -58,7 +58,7 @@ public:
     //lab04
     Mesh* mesh;
     Shader* shader;
-    
+    GLuint texID;
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
