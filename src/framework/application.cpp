@@ -194,6 +194,9 @@ void Application::Init(void)
     glGenTextures(1, &texID);
     glBindTexture(GL_TEXTURE_2D, texID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, myImage->width, myImage->height, 0, GL_RGB, GL_UNSIGNED_BYTE, myImage->pixels);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 }
 
@@ -233,9 +236,13 @@ void Application::Render(void)
     
     shader->Enable();
     shader->SetTexture("u_texture", texID);
+    shader->SetInt("u_task", currentTask);
+    shader->SetInt("u_subtask", currentSubtask - 'a');
+    
+    shader->SetFloat("time", time);
     mesh->Render(GL_TRIANGLES);
     shader->Disable();
-
+    
 }
 
 // Called after render
@@ -253,6 +260,9 @@ void Application::Update(float seconds_elapsed)
         entity2->Update(seconds_elapsed);
         entity3->Update(seconds_elapsed);
     }*/
+    
+    //lab04
+    time += seconds_elapsed;
 
 }
 
@@ -280,7 +290,9 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
         case SDLK_MINUS:
             current_border--;
             break;*/
-        case SDLK_1:
+        
+        //lab04
+        /*case SDLK_1:
             scene_mode = 1;
             break;
 
@@ -361,6 +373,46 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             else if(mode != eRenderMode::TRIANGLES){
                 mode = eRenderMode::TRIANGLES;
             }
+            break;*/
+        
+        case SDLK_1:
+            currentTask = 1;
+            break;
+
+        case SDLK_2:
+            currentTask = 2;
+            break;
+            
+        case SDLK_3:
+            currentTask = 3;
+            break;
+            
+        case SDLK_4:
+            currentTask = 4;
+            break;
+            
+        case SDL_SCANCODE_A:
+            currentSubtask = 'a';
+            break;
+        
+        case SDL_SCANCODE_B:
+            currentSubtask = 'b';
+            break;
+            
+        case SDL_SCANCODE_C:
+            currentSubtask = 'c';
+            break;
+            
+        case SDL_SCANCODE_D:
+            currentSubtask = 'd';
+            break;
+            
+        case SDL_SCANCODE_E:
+            currentSubtask = 'e';
+            break;
+            
+        case SDL_SCANCODE_F:
+            currentSubtask = 'f';
             break;
     }
 }

@@ -59,6 +59,8 @@ public:
     Mesh* mesh;
     Shader* shader;
     GLuint texID;
+    int currentTask = 2;   
+    char currentSubtask = 'a';
 
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
