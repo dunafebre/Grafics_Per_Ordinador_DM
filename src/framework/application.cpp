@@ -241,7 +241,7 @@ void Application::Render(void)
     
     shader->SetFloat("time", time);
     mesh->Render(GL_TRIANGLES);
-    shader->Disable();
+    shader->Disable(); //hola
     
 }
 
