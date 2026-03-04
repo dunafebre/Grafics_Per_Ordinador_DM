@@ -58,10 +58,14 @@ public:
     //lab04
     Mesh* mesh;
     Shader* shader;
-    GLuint texID;
-    int currentTask = 2;   
+    int currentTask = 1;
     char currentSubtask = 'a';
+    Texture* myTexture;
+    int currentLab = 4;
 
+    //lab05
+    sUniformData uniformData;
+    
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
 	void OnMouseButtonUp(SDL_MouseButtonEvent event);

@@ -10,7 +10,7 @@
 #include <cstring>
 #include <iostream>
 
-void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode, bool useTexture, bool useZBuffer, bool useInterpolatedUV)
+/*void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const Color& c1, const Color& c2, FloatImage* zBuffer, eRenderMode mode, bool useTexture, bool useZBuffer, bool useInterpolatedUV)
 {
     for (int i = 0; i < mesh->vertices.size(); i += 3)
     {
@@ -82,6 +82,30 @@ void Entity::Render(Image* framebuffer, Camera* camera, const Color& c0, const C
             framebuffer->DrawTriangleInterpolated(triangle,zBuffer,useTexture,useZBuffer, useInterpolatedUV);
         }
     }
+}*/
+
+void Entity::RenderLab4(Camera* camera){
+    glEnable(GL_DEPTH_TEST);
+
+    shader->Enable();
+
+    shader->SetMatrix44("u_model", model);
+    Matrix44 vp = camera->viewprojection_matrix;
+    shader->SetMatrix44("u_viewprojection", vp);
+
+    shader->SetTexture("u_texture", texture);
+
+    mesh->Render(GL_TRIANGLES);
+
+    shader->Disable();
+    
+}
+
+void Entity::RenderLab5(sUniformData& data){
+    data.model = model; //actualitza la model
+    material->Enable(data); //activa el seu material
+    mesh->Render(GL_TRIANGLES); //dibuixa o renderitza la mesh
+    material->Disable(); //neteja tot
 }
 
 void Entity::Update(float seconds_elapsed)

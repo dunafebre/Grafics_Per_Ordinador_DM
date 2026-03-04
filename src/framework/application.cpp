@@ -3,6 +3,7 @@
 #include "mesh.h"
 #include "shader.h"
 #include "utils.h"
+#include "texture.h"
 
 Application::Application(const char* caption, int width, int height)
 {
@@ -183,21 +184,55 @@ void Application::Init(void)
     zBuffer.Resize(framebuffer.width, framebuffer.height);*/
     
     //lab04
+    glEnable(GL_DEPTH_TEST);
+    
+    camera = new Camera();
+
+    camera->SetPerspective(40.0f, framebuffer.width / (float)framebuffer.height, 0.1f, 1000.0f);
+    camera->LookAt(Vector3(0,0,1), Vector3(0,-0.2,0), Vector3(0,1,0));
+
+    camera->UpdateViewMatrix();
+    camera->UpdateProjectionMatrix();
+    camera->UpdateViewProjectionMatrix();
+    
     mesh = new Mesh();
     mesh->CreateQuad();
-
+    
     shader = Shader::Get("shaders/quad.vs","shaders/quad.fs");
-
-    Image* myImage = new Image();
-    myImage->LoadPNG("images/fruits.png");
+    myTexture = Texture::Get("images/fruits.png");
+        
+    //entity 1
+    Mesh* mesh1 = new Mesh();
+    mesh1->LoadOBJ("meshes/lee.obj");
+    Matrix44 model1;
+    Texture* tex1 = Texture::Get("textures/lee_color_specular.tga");
+    entity1 = new Entity(mesh1, model1, tex1, ZERO);
     
-    glGenTextures(1, &texID);
-    glBindTexture(GL_TEXTURE_2D, texID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, myImage->width, myImage->height, 0, GL_RGB, GL_UNSIGNED_BYTE, myImage->pixels);
+    entity1->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    //entity 2
+    Mesh* mesh2 = new Mesh();
+    mesh2->LoadOBJ("meshes/anna.obj");
+    Matrix44 model2;
+    model2.SetIdentity();
+    model2.MakeTranslationMatrix(0.4, 0.0f, 0.0f);
+    Texture* tex2 = Texture::Get("textures/anna_color_specular.tga");
+    entity2 = new Entity(mesh2, model2, tex2, ZERO);
+    
+    entity2->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+
+    //entity 3
+    Mesh* mesh3 = new Mesh();
+    mesh3->LoadOBJ("meshes/cleo.obj");
+    Matrix44 model3;
+    model3.SetIdentity();
+    model3.MakeTranslationMatrix(-0.4, 0.0f, 0.0f);
+    Texture* tex3 = Texture::Get("textures/cleo_color_specular.tga");
+    entity3 = new Entity(mesh3, model3, tex3, ZERO);
+    
+    entity3->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+    
 }
 
 // Render one frame
@@ -232,16 +267,39 @@ void Application::Render(void)
     framebuffer.Render();*/
     
     //lab04
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //equivalent a Fill Color i Fill z-Buffer
+    if(currentLab == 4){
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //equivalent a Fill Color i Fill z-Buffer
+        if(currentTask != 4){
+            shader->Enable();
+            shader->SetTexture("u_texture", myTexture);
+            shader->SetInt("u_task", currentTask);
+            shader->SetInt("u_subtask", currentSubtask - 'a');
+            
+            shader->SetFloat("time", time);
+            mesh->Render(GL_TRIANGLES);
+            shader->Disable();
+        }
+
+        else if(currentTask == 4){
+            entity1->RenderLab4(camera);
+            entity2->RenderLab4(camera);
+            entity3->RenderLab4(camera);
+        }
+    }
+    else if(currentLab == 5){
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        uniformData.view_projection = camera->viewprojection_matrix;
+        uniformData.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
+        uniformData.scene_light.position = Vector3(10, 10, 10);
+        uniformData.scene_light.color = Vector3(1, 1, 1);
+        
+        entity1->RenderLab5(uniformData);
+        entity2->RenderLab5(uniformData);
+        entity3->RenderLab5(uniformData);
+    }
     
-    shader->Enable();
-    shader->SetTexture("u_texture", texID);
-    shader->SetInt("u_task", currentTask);
-    shader->SetInt("u_subtask", currentSubtask - 'a');
     
-    shader->SetFloat("time", time);
-    mesh->Render(GL_TRIANGLES);
-    shader->Disable(); //hola
     
 }
 
@@ -391,28 +449,37 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             currentTask = 4;
             break;
             
-        case SDL_SCANCODE_A:
+        case SDLK_a:
             currentSubtask = 'a';
             break;
         
-        case SDL_SCANCODE_B:
+        case SDLK_b:
             currentSubtask = 'b';
             break;
             
-        case SDL_SCANCODE_C:
+        case SDLK_c:
             currentSubtask = 'c';
             break;
             
-        case SDL_SCANCODE_D:
+        case SDLK_d:
             currentSubtask = 'd';
             break;
             
-        case SDL_SCANCODE_E:
+        case SDLK_e:
             currentSubtask = 'e';
             break;
             
-        case SDL_SCANCODE_F:
+        case SDLK_f:
             currentSubtask = 'f';
+            break;
+            
+        case SDLK_l: //OJO!!!
+            if(currentLab == 4){
+                currentLab = 5;
+            }
+            else{
+                currentLab = 4;
+            }
             break;
     }
 }
