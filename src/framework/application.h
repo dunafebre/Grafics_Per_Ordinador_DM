@@ -65,6 +65,10 @@ public:
 
     //lab05
     sUniformData uniformData;
+    Vector3 ka = Vector3(0.1f, 0.1f, 0.1f);
+    Vector3 kd = Vector3(1.0f, 1.0f, 1.0f);
+    Vector3 ks = Vector3(1.0f, 1.0f, 1.0f);
+    float shininess = 32.0f;
     
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);

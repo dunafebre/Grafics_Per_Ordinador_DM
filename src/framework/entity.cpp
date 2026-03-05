@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "entity.h"
 #include "image.h"
+#include "shader.h"
 #include "main/includes.h"
 
 #include <string>
@@ -87,22 +88,21 @@
 void Entity::RenderLab4(Camera* camera){
     glEnable(GL_DEPTH_TEST);
 
-    shader->Enable();
+    material->shader->Enable();
 
-    shader->SetMatrix44("u_model", model);
+    material->shader->SetMatrix44("u_model", model);
     Matrix44 vp = camera->viewprojection_matrix;
-    shader->SetMatrix44("u_viewprojection", vp);
+    material->shader->SetMatrix44("u_viewprojection", vp);
 
-    shader->SetTexture("u_texture", texture);
+    material->shader->SetTexture("u_texture", material->texture);
 
     mesh->Render(GL_TRIANGLES);
 
-    shader->Disable();
-    
+    material->shader->Disable();
 }
 
 void Entity::RenderLab5(sUniformData& data){
-    data.model = model; //actualitza la model
+    data.model_matrix = model; //actualitza la model
     material->Enable(data); //activa el seu material
     mesh->Render(GL_TRIANGLES); //dibuixa o renderitza la mesh
     material->Disable(); //neteja tot

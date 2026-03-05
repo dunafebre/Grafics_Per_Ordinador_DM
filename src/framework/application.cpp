@@ -206,10 +206,8 @@ void Application::Init(void)
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
     Texture* tex1 = Texture::Get("textures/lee_color_specular.tga");
-    entity1 = new Entity(mesh1, model1, tex1, ZERO);
-    
-    entity1->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-    
+    Material* m1 = new Material(shader, tex1, ka, kd, ks, shininess);
+    entity1 = new Entity(mesh1, model1, ZERO, m1);
 
     //entity 2
     Mesh* mesh2 = new Mesh();
@@ -218,9 +216,8 @@ void Application::Init(void)
     model2.SetIdentity();
     model2.MakeTranslationMatrix(0.4, 0.0f, 0.0f);
     Texture* tex2 = Texture::Get("textures/anna_color_specular.tga");
-    entity2 = new Entity(mesh2, model2, tex2, ZERO);
-    
-    entity2->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+    Material* m2 = new Material(shader, tex2, ka, kd, ks, shininess);
+    entity2 = new Entity(mesh2, model2, ZERO, m2);
 
     //entity 3
     Mesh* mesh3 = new Mesh();
@@ -229,10 +226,19 @@ void Application::Init(void)
     model3.SetIdentity();
     model3.MakeTranslationMatrix(-0.4, 0.0f, 0.0f);
     Texture* tex3 = Texture::Get("textures/cleo_color_specular.tga");
-    entity3 = new Entity(mesh3, model3, tex3, ZERO);
+    Material* m3 = new Material(shader, tex3, ka, kd, ks, shininess);
+    entity3 = new Entity(mesh3, model3, ZERO, m3);
     
-    entity3->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-    
+    if(currentLab == 4){
+        entity1->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+        entity2->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+        entity3->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+    }
+    else if(currentLab == 5){
+        entity1->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+        entity2->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+        entity3->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+    }
 }
 
 // Render one frame
@@ -290,6 +296,7 @@ void Application::Render(void)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         uniformData.view_projection = camera->viewprojection_matrix;
+        uniformData.camera_position = camera->eye;
         uniformData.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
         uniformData.scene_light.position = Vector3(10, 10, 10);
         uniformData.scene_light.color = Vector3(1, 1, 1);
