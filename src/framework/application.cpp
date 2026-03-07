@@ -229,16 +229,6 @@ void Application::Init(void)
     Material* m3 = new Material(shader, tex3, ka, kd, ks, shininess);
     entity3 = new Entity(mesh3, model3, ZERO, m3);
     
-    if(currentLab == 4){
-        entity1->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-        entity2->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-        entity3->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-    }
-    else if(currentLab == 5){
-        entity1->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
-        entity2->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
-        entity3->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
-    }
 }
 
 // Render one frame
@@ -480,12 +470,36 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             currentSubtask = 'f';
             break;
             
-        case SDLK_l: //OJO!!!
+        case SDLK_l:
             if(currentLab == 4){
                 currentLab = 5;
+                if(phong_shading){
+                    entity1->material->shader = Shader::Get("shaders/phong.vs", "shaders/phong.fs");
+                    entity2->material->shader = Shader::Get("shaders/phong.vs", "shaders/phong.fs");
+                    entity3->material->shader = Shader::Get("shaders/phong.vs", "shaders/phong.fs");
+                }
+                else if(!phong_shading){
+                    entity1->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+                    entity2->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+                    entity3->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+                }
             }
             else{
                 currentLab = 4;
+                entity1->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+                entity2->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+                entity3->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+            }
+            break;
+        case SDLK_p:
+            if(!phong_shading){
+                phong_shading = true;
+            }
+            break;
+        
+        case SDLK_g:
+            if(phong_shading){
+                phong_shading = false;
             }
             break;
     }

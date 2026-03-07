@@ -6,17 +6,6 @@ uniform mat4 u_viewprojection;
 varying vec2 v_uv;
 varying vec3 v_world_position;
 varying vec3 v_world_normal;
-varying vec3 u_ip;
-
-uniform vec3 u_light_position; //punt de llum
-uniform vec3 u_camera_position; //ull
-uniform float u_s;
-uniform vec3 u_ka;
-uniform vec3 u_kd;
-uniform vec3 u_ks;
-uniform vec3 u_ia;
-uniform vec3 u_id;
-uniform vec3 u_is;
 
 void main()
 {	
@@ -31,13 +20,6 @@ void main()
 	// Pass them to the fragment shader interpolated
 	v_world_position = world_position;
 	v_world_normal = world_normal;
-
-    vec3 N = normalize(v_world_normal);
-    vec3 L = normalize(u_light_position - v_world_position);
-    vec3 V = normalize(u_camera_position - v_world_position);
-    vec3 R = normalize(reflect(-L, N));
-
-    u_ip = (u_ka * u_ia) + (u_kd * clamp(dot(L, N), 0.0, 1.0) * u_id) + (u_ks * pow(clamp(dot(R, V), 0.0, 1.0), u_s) * u_is);
     
 	// Project the vertex using the model view projection matrix
 	gl_Position = u_viewprojection * vec4(world_position, 1.0); //output of the vertex shader

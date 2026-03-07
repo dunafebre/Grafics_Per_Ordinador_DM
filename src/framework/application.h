@@ -69,6 +69,7 @@ public:
     Vector3 kd = Vector3(1.0f, 1.0f, 1.0f);
     Vector3 ks = Vector3(1.0f, 1.0f, 1.0f);
     float shininess = 32.0f;
+    bool phong_shading = true;
     
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
