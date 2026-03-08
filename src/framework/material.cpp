@@ -31,6 +31,11 @@ void Material::Enable(const sUniformData& data){
     shader->SetUniform3("u_is", light.color.x, light.color.y, light.color.z);
     
     shader->SetTexture("u_texture", texture);
+    shader->SetTexture("u_normal_texture", normal_texture);
+    
+    shader->SetInt("use_color_texture", data.use_color_texture);
+    shader->SetInt("use_specular_texture", data.use_specular_texture);
+    shader->SetInt("use_normal_texture", data.use_normal_texture);
 }
 
 void Material::Disable(){

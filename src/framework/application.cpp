@@ -200,21 +200,14 @@ void Application::Init(void)
     
     shader = Shader::Get("shaders/quad.vs","shaders/quad.fs");
     myTexture = Texture::Get("images/fruits.png");
-    
-    color_path1 = "textures/lee_color_specular.tga";
-    color_path2 = "textures/anna_color_specular.tga";
-    color_path3 = "textures/cleo_color_specular.tga";
-
-    normal_path1 = "textures/lee_normal.tga";
-    normal_path2 = "textures/anna_normal.tga";
-    normal_path3 = "textures/cleo_normal.tga";
         
     //entity 1
     Mesh* mesh1 = new Mesh();
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
-    Texture* tex1 = Texture::Get(color_path1.c_str());
-    Material* m1 = new Material(shader, tex1, ka, kd, ks, shininess);
+    Texture* tex1 = Texture::Get("textures/lee_color_specular.tga");
+    Texture* tex1_normal = Texture::Get("textures/lee_normal.tga");
+    Material* m1 = new Material(shader, tex1, tex1_normal, ka, kd, ks, shininess);
     entity1 = new Entity(mesh1, model1, ZERO, m1);
 
     //entity 2
@@ -223,8 +216,9 @@ void Application::Init(void)
     Matrix44 model2;
     model2.SetIdentity();
     model2.MakeTranslationMatrix(0.4, 0.0f, 0.0f);
-    Texture* tex2 = Texture::Get(color_path2.c_str());
-    Material* m2 = new Material(shader, tex2, ka, kd, ks, shininess);
+    Texture* tex2 = Texture::Get("textures/anna_color_specular.tga");
+    Texture* tex2_normal = Texture::Get("textures/anna_normal.tga");
+    Material* m2 = new Material(shader, tex2, tex2_normal, ka, kd, ks, shininess);
     entity2 = new Entity(mesh2, model2, ZERO, m2);
 
     //entity 3
@@ -233,8 +227,9 @@ void Application::Init(void)
     Matrix44 model3;
     model3.SetIdentity();
     model3.MakeTranslationMatrix(-0.4, 0.0f, 0.0f);
-    Texture* tex3 = Texture::Get(color_path3.c_str());
-    Material* m3 = new Material(shader, tex3, ka, kd, ks, shininess);
+    Texture* tex3 = Texture::Get("textures/cleo_color_specular.tga");
+    Texture* tex3_normal = Texture::Get("textures/cleo_normal.tga");
+    Material* m3 = new Material(shader, tex3, tex3_normal, ka, kd, ks, shininess);
     entity3 = new Entity(mesh3, model3, ZERO, m3);
     
 }
@@ -301,10 +296,6 @@ void Application::Render(void)
         uniformData.scene_light.push_back({Vector3(-10,10,5), Vector3(0.5f,0.5f,1)});
         uniformData.scene_light.push_back({Vector3(10,10,5), Vector3(1,0.5f,1)});
         uniformData.scene_light.push_back({Vector3(-10,-10,10), Vector3(0.5f,0.5f,1)});
-        
-        shader->SetInt("use_color_texture", use_color_texture);
-        shader->SetInt("use_specular_texture", use_specular_texture);
-        shader->SetInt("use_normal_texture", use_normal_texture);
         
         entity1->RenderLab5(uniformData);
         entity2->RenderLab5(uniformData);
@@ -514,11 +505,11 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 currentSubtask = 'c';
             }
             else if(currentLab == 5){
-                if (use_color_texture){
-                    use_color_texture = false;
+                if (uniformData.use_color_texture){
+                    uniformData.use_color_texture = false;
                 }
                 else{
-                    use_color_texture = true;
+                    uniformData.use_color_texture = true;
                 }
             }
             break;
@@ -577,25 +568,19 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             }
             break;
         case SDLK_s:
-            if (use_specular_texture){
-                use_specular_texture = false;
+            if (uniformData.use_specular_texture){
+                uniformData.use_specular_texture = false;
             }
             else{
-                use_specular_texture = true;
+                uniformData.use_specular_texture = true;
             }
             break;
         case SDLK_n:
-            if (use_normal_texture){
-                use_normal_texture = false;
-                entity1->material->texture = Texture::Get(normal_path1.c_str());
-                entity2->material->texture = Texture::Get(normal_path2.c_str());
-                entity3->material->texture = Texture::Get(normal_path3.c_str());
+            if (uniformData.use_normal_texture){
+                uniformData.use_normal_texture = false;
             }
             else{
-                use_normal_texture = true;
-                entity1->material->texture = Texture::Get(color_path1.c_str());
-                entity2->material->texture = Texture::Get(color_path2.c_str());
-                entity3->material->texture = Texture::Get(color_path3.c_str());
+                uniformData.use_normal_texture = true;
             }
             break;
     }
