@@ -70,6 +70,17 @@ public:
     Vector3 ks = Vector3(1.0f, 1.0f, 1.0f);
     float shininess = 32.0f;
     bool phong_shading = true;
+    int use_color_texture = 1;
+    int use_specular_texture = 1;
+    int use_normal_texture = 1;
+    
+    std::string color_path1;
+    std::string color_path2;
+    std::string color_path3;
+
+    std::string normal_path1;
+    std::string normal_path2;
+    std::string normal_path3;
     
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);

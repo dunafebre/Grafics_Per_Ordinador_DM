@@ -10,5 +10,5 @@ void main()
 {
     // Set the ouput color per pixel
     vec4 tex_color = texture2D(u_texture, v_uv);
-    gl_FragColor = vec4( u_ip, 1.0 ) * tex_colorl;
+    gl_FragColor = vec4( u_ip, 1.0 ) * tex_color;
 }

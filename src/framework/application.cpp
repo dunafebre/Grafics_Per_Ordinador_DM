@@ -200,12 +200,20 @@ void Application::Init(void)
     
     shader = Shader::Get("shaders/quad.vs","shaders/quad.fs");
     myTexture = Texture::Get("images/fruits.png");
+    
+    color_path1 = "textures/lee_color_specular.tga";
+    color_path2 = "textures/anna_color_specular.tga";
+    color_path3 = "textures/cleo_color_specular.tga";
+
+    normal_path1 = "textures/lee_normal.tga";
+    normal_path2 = "textures/anna_normal.tga";
+    normal_path3 = "textures/cleo_normal.tga";
         
     //entity 1
     Mesh* mesh1 = new Mesh();
     mesh1->LoadOBJ("meshes/lee.obj");
     Matrix44 model1;
-    Texture* tex1 = Texture::Get("textures/lee_color_specular.tga");
+    Texture* tex1 = Texture::Get(color_path1.c_str());
     Material* m1 = new Material(shader, tex1, ka, kd, ks, shininess);
     entity1 = new Entity(mesh1, model1, ZERO, m1);
 
@@ -215,7 +223,7 @@ void Application::Init(void)
     Matrix44 model2;
     model2.SetIdentity();
     model2.MakeTranslationMatrix(0.4, 0.0f, 0.0f);
-    Texture* tex2 = Texture::Get("textures/anna_color_specular.tga");
+    Texture* tex2 = Texture::Get(color_path2.c_str());
     Material* m2 = new Material(shader, tex2, ka, kd, ks, shininess);
     entity2 = new Entity(mesh2, model2, ZERO, m2);
 
@@ -225,7 +233,7 @@ void Application::Init(void)
     Matrix44 model3;
     model3.SetIdentity();
     model3.MakeTranslationMatrix(-0.4, 0.0f, 0.0f);
-    Texture* tex3 = Texture::Get("textures/cleo_color_specular.tga");
+    Texture* tex3 = Texture::Get(color_path3.c_str());
     Material* m3 = new Material(shader, tex3, ka, kd, ks, shininess);
     entity3 = new Entity(mesh3, model3, ZERO, m3);
     
@@ -290,6 +298,10 @@ void Application::Render(void)
         uniformData.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
         uniformData.scene_light.position = Vector3(10, 10, 10);
         uniformData.scene_light.color = Vector3(1, 1, 1);
+        
+        shader->SetInt("use_color_texture", use_color_texture);
+        shader->SetInt("use_specular_texture", use_specular_texture);
+        shader->SetInt("use_normal_texture", use_normal_texture);
         
         entity1->RenderLab5(uniformData);
         entity2->RenderLab5(uniformData);
@@ -454,10 +466,20 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             currentSubtask = 'b';
             break;
             
-        case SDLK_c:
-            currentSubtask = 'c';
+        case SDL_SCANCODE_C:
+            if(currentLab == 4){
+                currentSubtask = 'c';
+            }
+            else if(currentLab == 5){
+                if (use_color_texture){
+                    use_color_texture = false;
+                }
+                else{
+                    use_color_texture = true;
+                }
+            }
             break;
-            
+
         case SDLK_d:
             currentSubtask = 'd';
             break;
@@ -473,33 +495,64 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
         case SDLK_l:
             if(currentLab == 4){
                 currentLab = 5;
+
                 if(phong_shading){
-                    entity1->material->shader = Shader::Get("shaders/phong.vs", "shaders/phong.fs");
-                    entity2->material->shader = Shader::Get("shaders/phong.vs", "shaders/phong.fs");
-                    entity3->material->shader = Shader::Get("shaders/phong.vs", "shaders/phong.fs");
+                    entity1->material->shader = Shader::Get("shaders/phong.vs","shaders/phong.fs");
+                    entity2->material->shader = Shader::Get("shaders/phong.vs","shaders/phong.fs");
+                    entity3->material->shader = Shader::Get("shaders/phong.vs","shaders/phong.fs");
                 }
-                else if(!phong_shading){
-                    entity1->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
-                    entity2->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
-                    entity3->material->shader = Shader::Get("shaders/gouraud.vs", "shaders/gouraud.fs");
+                else{
+                    entity1->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
+                    entity2->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
+                    entity3->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
                 }
             }
             else{
                 currentLab = 4;
-                entity1->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-                entity2->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
-                entity3->material->shader = Shader::Get("shaders/raster.vs", "shaders/raster.fs");
+
+                entity1->material->shader = Shader::Get("shaders/raster.vs","shaders/raster.fs");
+                entity2->material->shader = Shader::Get("shaders/raster.vs","shaders/raster.fs");
+                entity3->material->shader = Shader::Get("shaders/raster.vs","shaders/raster.fs");
             }
             break;
         case SDLK_p:
-            if(!phong_shading){
-                phong_shading = true;
+            phong_shading = true;
+
+            if(currentLab == 5){
+                entity1->material->shader = Shader::Get("shaders/phong.vs","shaders/phong.fs");
+                entity2->material->shader = Shader::Get("shaders/phong.vs","shaders/phong.fs");
+                entity3->material->shader = Shader::Get("shaders/phong.vs","shaders/phong.fs");
             }
             break;
-        
         case SDLK_g:
-            if(phong_shading){
-                phong_shading = false;
+            phong_shading = false;
+
+            if(currentLab == 5){
+                entity1->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
+                entity2->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
+                entity3->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
+            }
+            break;
+        case SDL_SCANCODE_S:
+            if (use_specular_texture){
+                use_specular_texture = false;
+            }
+            else{
+                use_specular_texture = true;
+            }
+            break;
+        case SDLK_n:
+            if (use_normal_texture){
+                use_normal_texture = false;
+                entity1->material->texture = Texture::Get(normal_path1.c_str());
+                entity2->material->texture = Texture::Get(normal_path2.c_str());
+                entity3->material->texture = Texture::Get(normal_path3.c_str());
+            }
+            else{
+                use_normal_texture = true;
+                entity1->material->texture = Texture::Get(color_path1.c_str());
+                entity2->material->texture = Texture::Get(color_path2.c_str());
+                entity3->material->texture = Texture::Get(color_path3.c_str());
             }
             break;
     }
