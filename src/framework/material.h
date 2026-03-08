@@ -22,7 +22,8 @@ struct sUniformData {
     Matrix44 view_projection;
     Vector3 camera_position;
     Vector3 ambient_light; //ia
-    sLight scene_light; //id i is -> color //light_position -> position
+    std::vector<sLight> scene_light; //id i is -> color //light_position -> position
+    int active_light = 0;
 };
 
 class Material {

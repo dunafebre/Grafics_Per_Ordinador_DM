@@ -81,6 +81,7 @@ public:
     std::string normal_path1;
     std::string normal_path2;
     std::string normal_path3;
+    int num_lights_active = 1;
     
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);
@@ -102,6 +103,7 @@ public:
 
 	void Init( void );
 	void Render( void );
+    void RenderMultipass( void );
 	void Update( float dt );
 
 	// Other methods to control the app

@@ -296,8 +296,11 @@ void Application::Render(void)
         uniformData.view_projection = camera->viewprojection_matrix;
         uniformData.camera_position = camera->eye;
         uniformData.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
-        uniformData.scene_light.position = Vector3(10, 10, 10);
-        uniformData.scene_light.color = Vector3(1, 1, 1);
+        uniformData.scene_light.clear();
+        uniformData.scene_light.push_back({Vector3(10,10,10), Vector3(1,1,1)});
+        uniformData.scene_light.push_back({Vector3(-10,10,5), Vector3(0.5f,0.5f,1)});
+        uniformData.scene_light.push_back({Vector3(10,10,5), Vector3(1,0.5f,1)});
+        uniformData.scene_light.push_back({Vector3(-10,-10,10), Vector3(0.5f,0.5f,1)});
         
         shader->SetInt("use_color_texture", use_color_texture);
         shader->SetInt("use_specular_texture", use_specular_texture);
@@ -307,9 +310,29 @@ void Application::Render(void)
         entity2->RenderLab5(uniformData);
         entity3->RenderLab5(uniformData);
     }
+}
+
+void Application::RenderMultipass(void)
+{
     
-    
-    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    for(int i = 0; i < num_lights_active; i++){
+        
+        uniformData.active_light = i;
+
+       
+        shader->SetVector3("u_light_position", uniformData.scene_light[i].position);
+        shader->SetVector3("u_light_color", uniformData.scene_light[i].color);
+        
+     
+        entity1->RenderLab5(uniformData);
+        entity2->RenderLab5(uniformData);
+        entity3->RenderLab5(uniformData);
+    }
+    glDisable(GL_BLEND);
 }
 
 // Called after render
@@ -443,19 +466,39 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             break;*/
         
         case SDLK_1:
-            currentTask = 1;
+            if(currentLab == 4){
+                currentTask = 1;
+            }
+            else if(currentLab == 5){
+                num_lights_active = 1;
+            }
             break;
 
         case SDLK_2:
-            currentTask = 2;
+            if(currentLab == 4){
+                currentTask = 2;
+            }
+            else if(currentLab == 5){
+                num_lights_active = 2;
+            }
             break;
             
         case SDLK_3:
-            currentTask = 3;
+            if(currentLab == 4){
+                currentTask = 3;
+            }
+            else if(currentLab == 5){
+                num_lights_active = 3;
+            }
             break;
             
         case SDLK_4:
-            currentTask = 4;
+            if(currentLab == 4){
+                currentTask = 4;
+            }
+            else if(currentLab == 5){
+                num_lights_active = 4;
+            }
             break;
             
         case SDLK_a:
@@ -466,7 +509,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             currentSubtask = 'b';
             break;
             
-        case SDL_SCANCODE_C:
+        case SDLK_c:
             if(currentLab == 4){
                 currentSubtask = 'c';
             }
@@ -533,7 +576,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 entity3->material->shader = Shader::Get("shaders/gouraud.vs","shaders/gouraud.fs");
             }
             break;
-        case SDL_SCANCODE_S:
+        case SDLK_s:
             if (use_specular_texture){
                 use_specular_texture = false;
             }
