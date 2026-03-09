@@ -310,19 +310,32 @@ void Application::Render(void)
 
 void Application::RenderMultipass()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-
-    for(int i = 0; i < num_lights_active; i++)
+    /*for(int i = 0; i < num_lights_active; i++)
     {
         uniformData.active_light = i;
 
         entity1->RenderLab5(uniformData);
         entity2->RenderLab5(uniformData);
         entity3->RenderLab5(uniformData);
-    }
+    }*/
+    for(int i = 0; i < num_lights_active; i++)
+     {
+         uniformData.active_light = i;
 
-    glDisable(GL_BLEND);
+         if (i > 0) {
+             glEnable(GL_BLEND);
+             glBlendFunc(GL_ONE, GL_ONE); //per fer el mix dels colors
+             glDepthFunc(GL_EQUAL);
+         }
+         else {
+             glDisable(GL_BLEND);
+             glDepthFunc(GL_LESS);
+         }
+
+         entity1->RenderLab5(uniformData);
+         entity2->RenderLab5(uniformData);
+         entity3->RenderLab5(uniformData);
+     }
 }
 
 // Called after render
@@ -472,7 +485,7 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             }
             else if(currentLab == 5){
                 scene_light.clear();
-                scene_light.push_back({Vector3(-30.0f, 10.0f, 20.0f), Vector3(1.0f, 0.0f, 0.0f)}); 
+                scene_light.push_back({Vector3(-30.0f, 10.0f, 20.0f), Vector3(1.0f, 0.0f, 0.0f)});
                 scene_light.push_back({Vector3(30.0f, 10.0f, 20.0f), Vector3(0.0f, 1.0f, 0.0f)});
                 num_lights_active = 2;
             }
@@ -493,6 +506,11 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
             
         case SDLK_4:
             currentTask = 4;
+            if(currentLab == 4){
+                entity1->material->shader = Shader::Get("shaders/raster.vs","shaders/raster.fs");
+                entity2->material->shader = Shader::Get("shaders/raster.vs","shaders/raster.fs");
+                entity3->material->shader = Shader::Get("shaders/raster.vs","shaders/raster.fs");
+            }
             break;
             
         case SDLK_a:
