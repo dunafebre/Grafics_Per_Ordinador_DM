@@ -11,31 +11,38 @@
 #include <cstring>
 #include <iostream>
 
-void Material::Enable(const sUniformData& data){
+void Material::Enable(const sUniformData& data)
+{
     shader->Enable();
 
     shader->SetMatrix44("u_model", data.model_matrix);
     shader->SetMatrix44("u_viewprojection", data.view_projection);
-    
+
+    shader->SetVector3("u_camera_position", data.camera_position);
+
     const sLight& light = data.scene_light[data.active_light];
-    shader->SetUniform3("u_light_position", light.position.x, light.position.y, light.position.z);
-    shader->SetUniform3("u_camera_position", data.camera_position.x, data.camera_position.y, data.camera_position.z);
-    
+
+    shader->SetVector3("u_light_position", light.position);
+    shader->SetVector3("u_id", light.color);
+    shader->SetVector3("u_is", light.color);
+
+    shader->SetVector3("u_ia", data.ambient_light);
+
+    shader->SetVector3("u_ka", ka);
+    shader->SetVector3("u_kd", kd);
+    shader->SetVector3("u_ks", ks);
+
     shader->SetUniform1("u_s", shininess);
-    shader->SetUniform3("u_ka", ka.x, ka.y, ka.z);
-    shader->SetUniform3("u_kd", kd.x, kd.y, kd.z);
-    shader->SetUniform3("u_ks", ks.x, ks.y, ks.z);
-    
-    shader->SetUniform3("u_ia", data.ambient_light.x, data.ambient_light.y, data.ambient_light.z);
-    shader->SetUniform3("u_id", light.color.x, light.color.y, light.color.z);
-    shader->SetUniform3("u_is", light.color.x, light.color.y, light.color.z);
-    
-    shader->SetTexture("u_texture", texture);
-    shader->SetTexture("u_normal_texture", normal_texture);
-    
-    shader->SetInt("use_color_texture", data.use_color_texture);
-    shader->SetInt("use_specular_texture", data.use_specular_texture);
-    shader->SetInt("use_normal_texture", data.use_normal_texture);
+
+    shader->SetUniform1("use_color_texture", data.use_color_texture);
+    shader->SetUniform1("use_specular_texture", data.use_specular_texture);
+    shader->SetUniform1("use_normal_texture", data.use_normal_texture);
+
+    if(texture)
+        shader->SetTexture("u_texture", texture);
+
+    if(normal_texture)
+        shader->SetTexture("u_normal_texture", normal_texture);
 }
 
 void Material::Disable(){

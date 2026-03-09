@@ -144,9 +144,9 @@ void Entity::Update(float seconds_elapsed)
         
         case ZERO:
         {
-            /*Matrix44 null;
+            Matrix44 null;
             null.SetIdentity();
-            model = null;*/
+            model = null;
         }
     }
 }

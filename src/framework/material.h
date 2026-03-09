@@ -25,9 +25,9 @@ struct sUniformData {
     std::vector<sLight> scene_light; //id i is -> color //light_position -> position
     int active_light = 0;
     
-    int use_color_texture = 1;
-    int use_specular_texture = 1;
-    int use_normal_texture = 1;
+    int use_color_texture;
+    int use_specular_texture;
+    int use_normal_texture;
 };
 
 class Material {

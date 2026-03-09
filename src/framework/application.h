@@ -71,6 +71,8 @@ public:
     float shininess = 32.0f;
     bool phong_shading = true;
     int num_lights_active = 1;
+    sLight main_light;
+    std::vector<sLight> scene_light;
     
 	void OnKeyPressed(SDL_KeyboardEvent event);
 	void OnMouseButtonDown(SDL_MouseButtonEvent event);

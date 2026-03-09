@@ -232,6 +232,16 @@ void Application::Init(void)
     Material* m3 = new Material(shader, tex3, tex3_normal, ka, kd, ks, shininess);
     entity3 = new Entity(mesh3, model3, ZERO, m3);
     
+    num_lights_active = 1;
+
+    uniformData.use_color_texture = true;
+    uniformData.use_specular_texture = true;
+    uniformData.use_normal_texture = true;
+    
+    scene_light.clear();
+
+    scene_light.push_back({Vector3(20.0f, 20.0f, 20.0f), Vector3(1.0f, 1.0f, 1.0f)});
+    
 }
 
 // Render one frame
@@ -291,38 +301,27 @@ void Application::Render(void)
         uniformData.view_projection = camera->viewprojection_matrix;
         uniformData.camera_position = camera->eye;
         uniformData.ambient_light = Vector3(0.1f, 0.1f, 0.1f);
-        uniformData.scene_light.clear();
-        uniformData.scene_light.push_back({Vector3(10,10,10), Vector3(1,1,1)});
-        uniformData.scene_light.push_back({Vector3(-10,10,5), Vector3(0.5f,0.5f,1)});
-        uniformData.scene_light.push_back({Vector3(10,10,5), Vector3(1,0.5f,1)});
-        uniformData.scene_light.push_back({Vector3(-10,-10,10), Vector3(0.5f,0.5f,1)});
+        uniformData.scene_light = scene_light;
         
-        entity1->RenderLab5(uniformData);
-        entity2->RenderLab5(uniformData);
-        entity3->RenderLab5(uniformData);
+        RenderMultipass();
+        
     }
 }
 
-void Application::RenderMultipass(void)
+void Application::RenderMultipass()
 {
-    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_DEPTH_TEST);
 
-    for(int i = 0; i < num_lights_active; i++){
-        
+    for(int i = 0; i < num_lights_active; i++)
+    {
         uniformData.active_light = i;
 
-       
-        shader->SetVector3("u_light_position", uniformData.scene_light[i].position);
-        shader->SetVector3("u_light_color", uniformData.scene_light[i].color);
-        
-     
         entity1->RenderLab5(uniformData);
         entity2->RenderLab5(uniformData);
         entity3->RenderLab5(uniformData);
     }
+
     glDisable(GL_BLEND);
 }
 
@@ -461,6 +460,8 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 currentTask = 1;
             }
             else if(currentLab == 5){
+                scene_light.clear();
+                scene_light.push_back({Vector3(20.0f, 20.0f, 20.0f), Vector3(1.0f, 1.0f, 1.0f)});
                 num_lights_active = 1;
             }
             break;
@@ -470,6 +471,9 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 currentTask = 2;
             }
             else if(currentLab == 5){
+                scene_light.clear();
+                scene_light.push_back({Vector3(-30.0f, 10.0f, 20.0f), Vector3(1.0f, 0.0f, 0.0f)}); 
+                scene_light.push_back({Vector3(30.0f, 10.0f, 20.0f), Vector3(0.0f, 1.0f, 0.0f)});
                 num_lights_active = 2;
             }
             break;
@@ -479,17 +483,16 @@ void Application::OnKeyPressed( SDL_KeyboardEvent event )
                 currentTask = 3;
             }
             else if(currentLab == 5){
+                scene_light.clear();
+                scene_light.push_back({Vector3(30.0f, 10.0f, 20.0f), Vector3(1.0f, 0.0f, 0.0f)});
+                scene_light.push_back({Vector3(-30.0f, 10.0f, 20.0f), Vector3(0.0f, 1.0f, 0.0f)});
+                scene_light.push_back({Vector3(0.0f, -10.0f, 30.0f), Vector3(0.0f, 0.0f, 1.0f)});
                 num_lights_active = 3;
             }
             break;
             
         case SDLK_4:
-            if(currentLab == 4){
-                currentTask = 4;
-            }
-            else if(currentLab == 5){
-                num_lights_active = 4;
-            }
+            currentTask = 4;
             break;
             
         case SDLK_a:
